@@ -1,9 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { UserSignUp } from './dto/user-signup.dto';
+import { BadRequestResponse, SuccessResponse } from 'src/constants/reponse.constants';
 
 @Injectable()
 export class UserService {
+  constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+
+  async signup(body: UserSignUp){
+    try {
+      const user = this.userRepository.create(body);
+      await this.userRepository.save(user);
+      return SuccessResponse()
+    } catch (error) {
+      throw BadRequestResponse
+    }
+  }
+
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }
