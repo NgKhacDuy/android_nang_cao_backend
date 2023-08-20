@@ -96,6 +96,7 @@ export class UserService {
   async changePassword(id: number, password: UserChangePassDto) {
     const user = await this.userRepository.findOneBy({ id });
     if (user !== null) {
+      password.password = await hash(password.password, 10);
       await this.userRepository.update(id, password);
       return SuccessResponse();
     }
