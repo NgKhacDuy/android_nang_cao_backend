@@ -8,10 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import { UserSignInDto } from './dto/user-signin.dto';
+import { UserChangePassDto } from './dto/user-changePass.dto';
 
 @Controller('user')
 export class UserController {
@@ -27,16 +27,11 @@ export class UserController {
     return await this.userService.signin(body);
   }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
   @Get('all')
   async findAll() {
     return this.userService.findAll();
   }
-  
+
   @Get(':name')
   findName(@Param('name') name: string) {
     return this.userService.findName(name);
@@ -48,8 +43,13 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateUser(id, updateUserDto);
+  }
+
+  @Patch('password/:id')
+  changePassword(@Param('id') id: number, @Body() password: UserChangePassDto) {
+    return this.userService.changePassword(id, password);
   }
 
   @Delete(':id')

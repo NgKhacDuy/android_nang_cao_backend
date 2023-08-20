@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +13,7 @@ import {
 import { compare, hash } from 'bcrypt';
 import { UserSignInDto } from './dto/user-signin.dto';
 import { sign } from 'jsonwebtoken';
+import { UserChangePassDto } from './dto/user-changePass.dto';
 
 @Injectable()
 export class UserService {
@@ -47,10 +47,6 @@ export class UserService {
     return SigninResponse(await this.accessToken(userExists), userExists);
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
-
   async findAll() {
     try {
       const users = await this.userRepository.find();
@@ -64,7 +60,7 @@ export class UserService {
   }
 
   async findId(id: number) {
-    const user = await this.userRepository.findOneBy({id});
+    const user = await this.userRepository.findOneBy({ id });
     if (user === null) {
       return NotFoundResponse();
     }
@@ -72,19 +68,38 @@ export class UserService {
   }
 
   async findName(name: string) {
-    const user = await this.userRepository.findOneBy({name});
+    const user = await this.userRepository.findOneBy({ name });
     if (user === null) {
       return NotFoundResponse();
     }
     return SuccessResponse(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user !== null) {
+      await this.userRepository.update(id, updateUserDto);
+      return SuccessResponse();
+    }
+    return NotFoundResponse();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user !== null) {
+      await this.userRepository.delete(id);
+      return SuccessResponse();
+    }
+    return NotFoundResponse();
+  }
+
+  async changePassword(id: number, password: UserChangePassDto) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user !== null) {
+      await this.userRepository.update(id, password);
+      return SuccessResponse();
+    }
+    return NotFoundResponse();
   }
 
   async findUserByEmail(email: string) {
