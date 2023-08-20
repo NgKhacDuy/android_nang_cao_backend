@@ -1,14 +1,9 @@
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
-export class UserSignUpDto{
+export class UserSignInDto{
     @IsNotEmpty()
     @IsString()
     username:string;
     @IsNotEmpty()
     password:string;
-    @IsNotEmpty()
-    @IsEmail()
-    email:string;
-    @IsNotEmpty()
-    name:string;
 }

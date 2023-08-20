@@ -1,16 +1,28 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/utilities/user-role.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({unique:true})
+  @Column({ unique: true })
   username: string;
-  @Column()
+  @Column({ select: false })
   password: string;
+  @Column({ unique: true })
+  email: string;
   @Column()
   name: string;
   @Column({ type: 'enum', enum: Role, array: true, default: [Role.USER] })
   roles: Role[];
+  @CreateDateColumn()
+  createAt: Date;
+  @CreateDateColumn()
+  updateAt: Date;
 }
