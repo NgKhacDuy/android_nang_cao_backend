@@ -104,7 +104,7 @@ export class UserService {
   }
 
   async findUserByEmail(email: string) {
-    return await this.userRepository.findOneBy({ email });
+    return await this.userRepository.findOneBy({ email  });
   }
 
   async accessToken(user: User) {
