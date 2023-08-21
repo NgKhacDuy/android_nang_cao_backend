@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  BadGatewayException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import { UserSignInDto } from './dto/user-signin.dto';
 import { UserChangePassDto } from './dto/user-changePass.dto';
+import { CurrentUser } from 'src/utilities/decorators/current-user.decorators';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -32,14 +35,9 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':name')
+  @Get('find/:name')
   findName(@Param('name') name: string) {
     return this.userService.findName(name);
-  }
-
-  @Get(':id')
-  findId(@Param('id') id: number) {
-    return this.userService.findId(id);
   }
 
   @Patch(':id')
@@ -55,5 +53,10 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Get('profile')
+  getProfile(@CurrentUser() currentUser: User) {
+    return currentUser;
   }
 }

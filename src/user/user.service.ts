@@ -44,7 +44,7 @@ export class UserService {
     const matchPassword = await compare(body.password, userExists.password);
     if (!matchPassword) return BadRequestResponse();
     delete userExists.password;
-    return SigninResponse(await this.accessToken(userExists), userExists);
+    return SigninResponse(await this.accessToken(userExists));
   }
 
   async findAll() {
@@ -104,7 +104,7 @@ export class UserService {
   }
 
   async findUserByEmail(email: string) {
-    return await this.userRepository.findOneBy({ email });
+    return await this.userRepository.findOneBy({ email    });
   }
 
   async accessToken(user: User) {
