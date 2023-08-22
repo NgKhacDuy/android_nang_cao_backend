@@ -1,9 +1,15 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { isArray } from 'class-validator';
 import { verify } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
+import { UnauthorizedResponse } from 'src/constants/reponse.constants';
+var jwt = require('jsonwebtoken');
 
 declare global {
   namespace Express {
@@ -26,13 +32,17 @@ export class CurrentUserMiddleware implements NestMiddleware {
       req.currentUser = null;
       next();
     } else {
-      const token = authHeader.split(' ')[1];
-      const { id } = <JwtPayload>(
-        verify(token, process.env.ACCESS_TOKEN_SECRET_KEY)
-      );
-      const currentUser = await this.userService.findId(+id);
-      req.currentUser = currentUser['data'];
-      next();
+      try {
+        const token = authHeader.split(' ')[1];
+        const { id } = <JwtPayload>(
+          verify(token, process.env.ACCESS_TOKEN_SECRET_KEY)
+        );
+        const currentUser = await this.userService.findId(+id);
+        req.currentUser = currentUser['data'];
+        next();
+      } catch (error) {
+        return next(new UnauthorizedException());
+      }
     }
   }
 }

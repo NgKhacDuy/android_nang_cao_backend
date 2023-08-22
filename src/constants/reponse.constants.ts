@@ -21,3 +21,8 @@ export const NotFoundResponse = () => ({
   message: '',
   statusCode: HttpStatus.NOT_FOUND,
 });
+
+export const UnauthorizedResponse = () => ({
+  message: '',
+  statusCode: HttpStatus.UNAUTHORIZED,
+});
