@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,8 +12,9 @@ import {
 } from 'src/constants/reponse.constants';
 import { compare, hash } from 'bcrypt';
 import { UserSignInDto } from './dto/user-signin.dto';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { UserChangePassDto } from './dto/user-changePass.dto';
+import { UserRefreshDto } from './dto/user-refresh.dto';
 
 @Injectable()
 export class UserService {
@@ -44,7 +45,10 @@ export class UserService {
     const matchPassword = await compare(body.password, userExists.password);
     if (!matchPassword) return BadRequestResponse();
     delete userExists.password;
-    return SigninResponse(await this.accessToken(userExists));
+    return SigninResponse(
+      await this.accessToken(userExists),
+      await this.generateRefreshToken(userExists),
+    );
   }
 
   async findAll() {
@@ -114,4 +118,31 @@ export class UserService {
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME },
     );
   }
+
+  async generateRefreshToken(user: User) {
+    return sign(
+      { id: user.id, username: user.username },
+      process.env.REFRESH_TOKEN_SECRET_KEY,
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME },
+    );
+  }
+
+  async refreshToken(refreshToken: UserRefreshDto) {
+    try {
+      const { id } = <JwtPayload>(
+        verify(refreshToken.refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY)
+      );
+      const user = await this.findId(+id);
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+      const accessToken = await this.accessToken(user['data']);
+      return { accessToken };
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
+  }
+}
+interface JwtPayload {
+  id: string;
 }

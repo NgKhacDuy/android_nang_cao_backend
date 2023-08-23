@@ -17,6 +17,14 @@ async function bootstrap() {
     .setTitle('Cinema api')
     .setDescription('All api for intergrate with mobile/front-end')
     .setVersion('1.0')
+    .addBearerAuth({
+      description: `[just text field] Please enter token in following format: Bearer <JWT>`,
+      name: 'Authorization',
+      bearerFormat: 'Bearer',
+      scheme: 'Bearer',
+      type: 'http', //
+      in: 'Header',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, config, documentOptions);
   SwaggerModule.setup('api', app, document);

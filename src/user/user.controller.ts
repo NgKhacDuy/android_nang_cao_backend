@@ -19,6 +19,7 @@ import { AuthenGuard } from 'src/utilities/guards/authentication.guard';
 import { AuthorizeGuard } from 'src/utilities/guards/authorization.guard';
 import { AuthorizeRoles } from 'src/utilities/decorators/authorize-roles.decorator';
 import { Role } from 'src/utilities/common/user-role.enum';
+import { UserRefreshDto } from './dto/user-refresh.dto';
 
 @Controller('user')
 export class UserController {
@@ -60,9 +61,14 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
-  @UseGuards(AuthenGuard)
+  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
   @Get('profile')
   getProfile(@CurrentUser() currentUser: User) {
     return currentUser;
+  }
+
+  @Post('refresh')
+  async refreshToken(@Body() refreshToken: UserRefreshDto) {
+    return await this.userService.refreshToken(refreshToken);
   }
 }
