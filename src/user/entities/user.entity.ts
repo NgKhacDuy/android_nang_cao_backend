@@ -24,4 +24,6 @@ export class User {
   createAt: Date;
   @CreateDateColumn()
   updateAt: Date;
+  @Column({ default: 0 })
+  isDeleted: boolean;
 }

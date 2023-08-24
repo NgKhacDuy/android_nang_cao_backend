@@ -8,8 +8,6 @@ import { verify } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
-import { UnauthorizedResponse } from 'src/constants/reponse.constants';
-var jwt = require('jsonwebtoken');
 
 declare global {
   namespace Express {

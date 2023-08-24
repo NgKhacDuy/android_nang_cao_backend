@@ -40,6 +40,7 @@ export class UserService {
       .createQueryBuilder('users')
       .addSelect('users.password')
       .where('users.username=:username', { username: body.username })
+      .andWhere('users.isDeleted = false')
       .getOne();
     if (!userExists) return BadRequestResponse();
     const matchPassword = await compare(body.password, userExists.password);
@@ -53,7 +54,11 @@ export class UserService {
 
   async findAll() {
     try {
-      const users = await this.userRepository.find();
+      const users = await this.userRepository.find({
+        where: {
+          isDeleted: false,
+        },
+      });
       if (!users || users.length === 0) {
         return NotFoundResponse();
       }
@@ -91,7 +96,8 @@ export class UserService {
   async remove(id: number) {
     const user = await this.userRepository.findOneBy({ id });
     if (user !== null) {
-      await this.userRepository.delete(id);
+      user.isDeleted = true;
+      await this.userRepository.save(user);
       return SuccessResponse();
     }
     return NotFoundResponse();
