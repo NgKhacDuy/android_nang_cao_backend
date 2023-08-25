@@ -13,6 +13,8 @@ export const dataSourceOptions: DataSourceOptions = {
   migrations: ['dist/db/migrations/*{ts,.js}'],
   synchronize: true,
   logging: true,
+  url: process.env.DB_URL,
+  ssl: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);
