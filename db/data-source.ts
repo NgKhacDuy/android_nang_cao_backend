@@ -14,7 +14,7 @@ export const dataSourceOptions: DataSourceOptions = {
   synchronize: true,
   logging: true,
   url: process.env.DB_URL,
-  ssl: true,
+  ssl: false,
 };
 
 const dataSource = new DataSource(dataSourceOptions);
