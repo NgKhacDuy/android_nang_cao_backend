@@ -26,7 +26,7 @@ export class UserService {
   async signup(body: UserSignUpDto) {
     try {
       const userExists = await this.findUserByEmail(body.email);
-      if (userExists) throw BadRequestResponse;
+      if (userExists) return BadRequestResponse();
       body.password = await hash(body.password, 10);
       const user = this.userRepository.create(body);
       await this.userRepository.save(user);
