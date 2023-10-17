@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
@@ -14,15 +13,20 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as path from 'path';
-import { Observable, of } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid';
+import { HttpService } from '@nestjs/axios';
+import * as fs from 'fs';
+import { map } from 'rxjs';
+import axios from 'axios';
+import { response } from 'express';
+import { SuccessResponse } from 'src/constants/reponse.constants';
 
 @ApiTags('product')
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly httpService: HttpService,
+  ) {}
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
@@ -50,20 +54,38 @@ export class ProductController {
   }
 
   @Post('image')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: 'src/img/product_img',
-        filename(req, file, callback) {
-          const filename: string =
-            path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-          const extension: string = path.parse(file.originalname).ext;
-          callback(null, `${filename}${extension}`);
-        },
-      }),
-    }),
-  )
-  uploadImage(@UploadedFile() file): Observable<Object> {
-    return of({ imagePath: file.name });
+  @UseInterceptors(FileInterceptor('file', {}))
+  uploadImage(@UploadedFile() file) {
+    try {
+      let data = new FormData();
+      var successResponse;
+      var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
+        'base64',
+      );
+      const headersRequest = {
+        'Content-Type': 'multipart/form-data;', // afaik this one is not needed
+        Authorization: `Basic ${auth}`,
+      };
+      data.append('file', file.buffer.toString('base64'));
+      data.append('fileName', file.originalname);
+      axios
+        .request({
+          method: 'POST',
+          maxBodyLength: Infinity,
+          url: process.env.URL_UPLOAD,
+          headers: headersRequest,
+          data: data,
+        })
+        .then((response) => {
+          console.log(response.data['url']);
+          successResponse = response.data['url'];
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      return SuccessResponse(successResponse);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
