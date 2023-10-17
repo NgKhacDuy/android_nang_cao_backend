@@ -3,7 +3,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import {
   BadRequestResponse,
   NotFoundResponse,
@@ -18,7 +18,9 @@ export class CategoryService {
   ) {}
   async create(createCategoryDto: CreateCategoryDto) {
     try {
-      const categoryExist = await this.findName(createCategoryDto.name);
+      const categoryExist = await this.categoryRepository.findOneBy({
+        name: createCategoryDto.name,
+      });
       if (categoryExist) return BadRequestResponse();
       const category = this.categoryRepository.create(createCategoryDto);
       await this.categoryRepository.save(category);
@@ -40,8 +42,8 @@ export class CategoryService {
     }
   }
 
-  findOne(id: number) {
-    const category = this.categoryRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const category = await this.categoryRepository.findOneBy({ id });
     if (category == null) {
       return NotFoundResponse();
     }
@@ -49,7 +51,15 @@ export class CategoryService {
   }
 
   async findName(name: string) {
-    return await this.categoryRepository.findOneBy({ name });
+    const category = await this.categoryRepository.find({
+      where: {
+        name: Like(`%${name}%`),
+      },
+    });
+    if (category == null || category.length === 0) {
+      return NotFoundResponse();
+    }
+    return SuccessResponse(category);
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
