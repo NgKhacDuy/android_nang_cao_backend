@@ -4,6 +4,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -13,8 +14,7 @@ import {
 export class RecipientBill {
   @PrimaryGeneratedColumn()
   id: number;
-  @OneToOne(() => Supplier)
-  @JoinColumn()
+  @ManyToOne(() => Supplier, (supplier) => supplier.recipientBill)
   supplier: Supplier;
   @Column()
   dateImport: Date;

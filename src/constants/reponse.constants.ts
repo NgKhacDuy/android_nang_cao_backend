@@ -21,8 +21,8 @@ export const BadRequestResponse = () => ({
   statusCode: HttpStatus.BAD_REQUEST,
 });
 
-export const NotFoundResponse = () => ({
-  message: '',
+export const NotFoundResponse = (message: string = '') => ({
+  message: message,
   statusCode: HttpStatus.NOT_FOUND,
 });
 

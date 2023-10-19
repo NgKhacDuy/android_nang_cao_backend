@@ -40,8 +40,8 @@ export class SupplierController {
     return this.supplierService.update(+id, updateSupplierDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.supplierService.remove(+id);
+  @Get('name/:name')
+  findName(@Param('name') name: string) {
+    return this.supplierService.findName(name);
   }
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Double, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('sale')
 export class Sale {
@@ -6,8 +6,8 @@ export class Sale {
   id: number;
   @Column()
   name: string;
-  @Column()
-  percent: string;
+  @Column({ type: 'double' })
+  percent: number;
   @Column()
   dateStart: Date;
   @Column()
