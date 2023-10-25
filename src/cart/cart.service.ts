@@ -38,30 +38,53 @@ export class CartService {
       });
       if (!cartExist) {
         const newCart = new Cart();
-        var listCartDetail = [];
+        const cartDetail = new CartDetail();
+        let listDetail = [];
         newCart.user = userExist;
-        for (let i in createCartDto.listProduct) {
-          const cartDetail = new CartDetail();
-          const productExist = await this.productRepository.findOneBy({
-            id: createCartDto.listProduct[i].productId,
-          });
-          if (!productExist) {
-            return NotFoundResponse('Product not found');
-          }
-          cartDetail.money = createCartDto.listProduct[i].money;
-          cartDetail.product = productExist;
-          cartDetail.productId = createCartDto.listProduct[i].productId;
-          cartDetail.quantity = createCartDto.listProduct[i].quantity;
-          await this.cartDetailRepository.save(cartDetail);
-          listCartDetail.push(cartDetail);
+        const productExist = await this.productRepository.findOneBy({
+          id: createCartDto.product.productId,
+        });
+        if (!productExist) {
+          return NotFoundResponse('Product not found');
         }
-        newCart.cartDetail = listCartDetail;
+        cartDetail.money = createCartDto.product.money;
+        cartDetail.product = productExist;
+        cartDetail.productId = createCartDto.product.productId;
+        cartDetail.quantity = createCartDto.product.quantity;
+        await this.cartDetailRepository.save(cartDetail);
+        listDetail.push(cartDetail);
+        newCart.cartDetail = listDetail;
         newCart.totalMoney = createCartDto.totalMoney;
         newCart.userId = currentUser.id;
         await this.cartRepository.save(newCart);
         return SuccessResponse();
       } else {
-        console.log('cart exists');
+        const cartDetail = new CartDetail();
+        const productExist = await this.productRepository.findOneBy({
+          id: createCartDto.product.productId,
+        });
+        if (!productExist) {
+          return NotFoundResponse('Product not found');
+        }
+        const existCartDetail = cartExist.cartDetail.find(
+          (productExist) =>
+            productExist.productId === createCartDto.product.productId,
+        );
+        if (existCartDetail) {
+          existCartDetail.quantity = createCartDto.product.quantity;
+          await this.cartDetailRepository.update(existCartDetail.id, {
+            quantity: existCartDetail.quantity,
+          });
+        } else {
+          cartDetail.money = createCartDto.product.money;
+          cartDetail.product = productExist;
+          cartDetail.productId = createCartDto.product.productId;
+          cartDetail.quantity = createCartDto.product.quantity;
+          await this.cartDetailRepository.save(cartDetail);
+          cartExist.cartDetail.push(cartDetail);
+          await this.cartRepository.save(cartExist);
+        }
+        return SuccessResponse();
       }
     } catch (error) {
       console.log(error);

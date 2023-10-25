@@ -19,7 +19,9 @@ export class Cart {
   user: User;
   @Column()
   userId: number;
-  @OneToMany(() => CartDetail, (cartDetail) => cartDetail.cart)
+  @OneToMany(() => CartDetail, (cartDetail) => cartDetail.cart, {
+    eager: true,
+  })
   cartDetail: CartDetail[];
   @Column()
   totalMoney: string;
