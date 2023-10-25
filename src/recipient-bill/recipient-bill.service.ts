@@ -59,7 +59,6 @@ export class RecipientBillService {
         recipientDetail.money = createRecipientBillDto.listProduct[i].money;
         await this.recipientDetailRepository.save(recipientDetail);
         listRecipientsDetail.push(recipientDetail);
-        console.log(listRecipientsDetail);
       }
     }
     recipientBill.dateImport = new Date();

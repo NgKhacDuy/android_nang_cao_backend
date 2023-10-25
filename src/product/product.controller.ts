@@ -19,6 +19,7 @@ import { map } from 'rxjs';
 import axios from 'axios';
 import { response } from 'express';
 import { SuccessResponse } from 'src/constants/reponse.constants';
+import { request } from 'http';
 
 @ApiTags('product')
 @Controller('product')

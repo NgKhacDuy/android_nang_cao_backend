@@ -12,6 +12,8 @@ import { SaleModule } from './sale/sale.module';
 import { OrderDetailModule } from './order_detail/order_detail.module';
 import { OrderModule } from './order/order.module';
 import { RateModule } from './rate/rate.module';
+import { CartModule } from './cart/cart.module';
+import { CartDetailModule } from './cart_detail/cart_detail.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { RateModule } from './rate/rate.module';
     OrderDetailModule,
     OrderModule,
     RateModule,
+    CartModule,
+    CartDetailModule,
   ],
   controllers: [],
   providers: [],
