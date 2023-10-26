@@ -17,6 +17,7 @@ import { AuthenGuard } from 'src/utilities/guards/authentication.guard';
 import { AuthorizeGuard } from 'src/utilities/guards/authorization.guard';
 import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from 'src/utilities/decorators/current-user.decorators';
+import { UpdateQuantityCartDto } from '../cart_detail/dto/update-quantity-cart.dto';
 
 @ApiTags('cart')
 @Controller('cart')
@@ -32,23 +33,9 @@ export class CartController {
     return this.cartService.create(currentUser, createCartDto);
   }
 
+  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
   @Get()
-  findAll() {
-    return this.cartService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  findAll(@CurrentUser() currentUser: User) {
+    return this.cartService.findAll(currentUser);
   }
 }

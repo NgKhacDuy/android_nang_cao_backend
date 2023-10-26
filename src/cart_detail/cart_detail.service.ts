@@ -4,12 +4,27 @@ import { UpdateCartDetailDto } from './dto/update-cart_detail.dto';
 import { CartDetail } from './entities/cart_detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { UpdateQuantityCartDto } from './dto/update-quantity-cart.dto';
+import {
+  NotFoundResponse,
+  SuccessResponse,
+  BadRequestResponse,
+} from 'src/constants/reponse.constants';
+import { Product } from 'src/product/entities/product.entity';
+import { Cart } from 'src/cart/entities/cart.entity';
 
 @Injectable()
 export class CartDetailService {
   constructor(
+    @InjectRepository(Cart)
+    private cartRepository: Repository<Cart>,
     @InjectRepository(CartDetail)
-    private categoryRepository: Repository<CartDetail>,
+    private cartDetailRepository: Repository<CartDetail>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
   ) {}
   create(createCartDetailDto: CreateCartDetailDto) {
     return 'This action adds a new cartDetail';
@@ -23,11 +38,87 @@ export class CartDetailService {
     return `This action returns a #${id} cartDetail`;
   }
 
-  update(id: number, updateCartDetailDto: UpdateCartDetailDto) {
-    return `This action updates a #${id} cartDetail`;
+  async update(
+    currentUser: User,
+    updateQuantityCartDto: UpdateQuantityCartDto,
+  ) {
+    try {
+      const userExist = await this.userRepository.findOneBy({
+        id: currentUser.id,
+      });
+      const cartExist = await this.cartRepository.findOneBy({
+        userId: currentUser.id,
+      });
+      const productExist = await this.productRepository.findOneBy({
+        id: updateQuantityCartDto.productId,
+      });
+      if (!productExist) {
+        return NotFoundResponse('Product not found');
+      }
+
+      if (!cartExist) {
+        return NotFoundResponse('Cart not found');
+      }
+
+      if (!userExist) {
+        return NotFoundResponse('User not found');
+      }
+
+      const productExistInCart = cartExist.cartDetail.find(
+        (cart) => cart.productId === updateQuantityCartDto.productId,
+      );
+      if (!productExistInCart) {
+        return NotFoundResponse('Product not found in cart');
+      }
+
+      productExistInCart.quantity = updateQuantityCartDto.quantity;
+      await this.cartDetailRepository.update(productExistInCart.id, {
+        quantity: productExistInCart.quantity,
+      });
+
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cartDetail`;
+  async remove(currentUser: User, id: number) {
+    try {
+      const userExist = await this.userRepository.findOneBy({
+        id: currentUser.id,
+      });
+      const cartExist = await this.cartRepository.findOneBy({
+        userId: currentUser.id,
+      });
+      const productExist = await this.productRepository.findOneBy({
+        id: id,
+      });
+      if (!productExist) {
+        return NotFoundResponse('Product not found');
+      }
+
+      if (!cartExist) {
+        return NotFoundResponse('Cart not found');
+      }
+
+      if (!userExist) {
+        return NotFoundResponse('User not found');
+      }
+
+      const productExistInCart = cartExist.cartDetail.find(
+        (cart) => cart.productId == id,
+      );
+      if (!productExistInCart) {
+        return NotFoundResponse('Product not found in cart');
+      }
+      await this.cartDetailRepository.delete({
+        productId: id,
+      });
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 }

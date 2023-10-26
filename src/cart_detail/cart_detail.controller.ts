@@ -6,42 +6,38 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CartDetailService } from './cart_detail.service';
-import { CreateCartDetailDto } from './dto/create-cart_detail.dto';
 import { UpdateCartDetailDto } from './dto/update-cart_detail.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { User } from 'src/user/entities/user.entity';
+import { CurrentUser } from 'src/utilities/decorators/current-user.decorators';
+import { Role } from 'src/utilities/common/user-role.enum';
+import { AuthenGuard } from 'src/utilities/guards/authentication.guard';
+import { AuthorizeGuard } from 'src/utilities/guards/authorization.guard';
+import { UpdateQuantityCartDto } from './dto/update-quantity-cart.dto';
 
 @ApiTags('cart-detail')
 @Controller('cart-detail')
 export class CartDetailController {
   constructor(private readonly cartDetailService: CartDetailService) {}
 
-  @Post()
-  create(@Body() createCartDetailDto: CreateCartDetailDto) {
-    return this.cartDetailService.create(createCartDetailDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.cartDetailService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartDetailService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
+  @Patch('quantity/:quantity')
   update(
-    @Param('id') id: string,
-    @Body() updateCartDetailDto: UpdateCartDetailDto,
+    @CurrentUser() currentUser: User,
+    @Body() updateQuantityCartDto: UpdateQuantityCartDto,
   ) {
-    return this.cartDetailService.update(+id, updateCartDetailDto);
+    return this.cartDetailService.update(currentUser, updateQuantityCartDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartDetailService.remove(+id);
+  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
+  @Delete(':productId')
+  remove(
+    @CurrentUser() currentUser: User,
+    @Param('productId') productId: number,
+  ) {
+    return this.cartDetailService.remove(currentUser, productId);
   }
 }

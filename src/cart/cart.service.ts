@@ -12,6 +12,7 @@ import {
   SuccessResponse,
 } from 'src/constants/reponse.constants';
 import { Product } from 'src/product/entities/product.entity';
+import { UpdateQuantityCartDto } from '../cart_detail/dto/update-quantity-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -92,19 +93,15 @@ export class CartService {
     }
   }
 
-  findAll() {
-    return `This action returns all cart`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
-  }
-
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  async findAll(currentUser: User) {
+    try {
+      const cartExist = await this.cartRepository.findOneBy({
+        userId: currentUser.id,
+      });
+      if (!cartExist) {
+        return NotFoundResponse('Cart not found');
+      }
+      return SuccessResponse(cartExist);
+    } catch (error) {}
   }
 }
