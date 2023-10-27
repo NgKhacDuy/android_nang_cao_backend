@@ -1,5 +1,6 @@
 import { OrderDetail } from 'src/order_detail/entities/order_detail.entity';
 import { User } from 'src/user/entities/user.entity';
+import { StatusOrder } from 'src/utilities/common/status-order.enum';
 import {
   Column,
   Entity,
@@ -20,4 +21,10 @@ export class Order {
   dateCreate: Date;
   @Column()
   totalMoney: string;
+  @Column({
+    type: 'enum',
+    enum: StatusOrder,
+    default: StatusOrder.WAITING_FOR_ACCEPT,
+  })
+  status: StatusOrder;
 }

@@ -7,7 +7,4 @@ export class CreateCartDetailDto {
   @IsNotEmpty()
   @IsNumber()
   quantity: number;
-  @IsNotEmpty()
-  @IsString()
-  money: string;
 }

@@ -1,5 +1,7 @@
 import { type } from 'os';
+import { CartDetail } from 'src/cart_detail/entities/cart_detail.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { OrderDetail } from 'src/order_detail/entities/order_detail.entity';
 import { Role } from 'src/utilities/common/user-role.enum';
 import {
   Column,
@@ -17,6 +19,13 @@ export class Product {
   id: number;
   @ManyToOne(() => Category, (category) => category.product, { eager: true })
   category: Category;
+  @ManyToOne(() => OrderDetail, (orderDetail) => orderDetail.product)
+  orderDetail: OrderDetail;
+  @ManyToOne(() => CartDetail, (cartDetail) => cartDetail.product, {
+    eager: true,
+    onDelete: 'SET NULL',
+  })
+  cartDetail: CartDetail;
   @Column()
   name: string;
   @Column()

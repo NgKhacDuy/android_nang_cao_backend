@@ -48,14 +48,15 @@ export class CartService {
         if (!productExist) {
           return NotFoundResponse('Product not found');
         }
-        cartDetail.money = createCartDto.product.money;
-        cartDetail.product = productExist;
+        // cartDetail.money = createCartDto.product.money;
+        cartDetail.product = [];
+        cartDetail.product.push(productExist);
         cartDetail.productId = createCartDto.product.productId;
         cartDetail.quantity = createCartDto.product.quantity;
         await this.cartDetailRepository.save(cartDetail);
         listDetail.push(cartDetail);
         newCart.cartDetail = listDetail;
-        newCart.totalMoney = createCartDto.totalMoney;
+        // newCart.totalMoney = createCartDto.totalMoney;
         newCart.userId = currentUser.id;
         await this.cartRepository.save(newCart);
         return SuccessResponse();
@@ -77,8 +78,9 @@ export class CartService {
             quantity: existCartDetail.quantity,
           });
         } else {
-          cartDetail.money = createCartDto.product.money;
-          cartDetail.product = productExist;
+          // cartDetail.money = createCartDto.product.money;
+          cartDetail.product = [];
+          cartDetail.product.push(productExist);
           cartDetail.productId = createCartDto.product.productId;
           cartDetail.quantity = createCartDto.product.quantity;
           await this.cartDetailRepository.save(cartDetail);

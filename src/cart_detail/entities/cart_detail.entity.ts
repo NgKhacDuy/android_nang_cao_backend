@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -13,15 +14,15 @@ import {
 export class CartDetail {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Cart, (cart) => cart.cartDetail)
+  @ManyToOne(() => Cart, (cart) => cart.cartDetail, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   cart: Cart;
-  @OneToOne(() => Product)
-  @JoinColumn()
-  product: Product;
+  @OneToMany(() => Product, (product) => product.cartDetail)
+  product: Product[];
   @Column()
   productId: number;
   @Column()
   quantity: number;
-  @Column()
-  money: string;
 }
