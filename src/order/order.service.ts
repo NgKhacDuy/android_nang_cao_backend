@@ -50,8 +50,11 @@ export class OrderService {
       let listOrderDetail = [];
       let totalMoney = 0;
       const order = new Order();
-      for (let i in cartExist.cartDetail) {
-        let item = cartExist.cartDetail;
+      let cartDetailTemp = await this.cartDetailRepository.findBy({
+        cart: { id: cartExist.id },
+      });
+      for (let i in cartDetailTemp) {
+        let item = cartDetailTemp;
         const product = await this.productRepository.findOneBy({
           id: item[i].productId,
         });

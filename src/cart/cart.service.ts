@@ -68,7 +68,14 @@ export class CartService {
         if (!productExist) {
           return NotFoundResponse('Product not found');
         }
-        const existCartDetail = cartExist.cartDetail.find(
+        const existCartDetailTemp = await this.cartDetailRepository.findBy({
+          cart: { id: cartExist.id },
+        });
+        // const existCartDetail = cartExist.cartDetail.find(
+        //   (productExist) =>
+        //     productExist.productId === createCartDto.product.productId,
+        // );
+        const existCartDetail = existCartDetailTemp.find(
           (productExist) =>
             productExist.productId === createCartDto.product.productId,
         );
