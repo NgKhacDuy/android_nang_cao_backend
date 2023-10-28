@@ -14,6 +14,7 @@ import {
   NotFoundResponse,
   SuccessResponse,
 } from 'src/constants/reponse.constants';
+import { StatusOrder } from 'src/utilities/common/status-order.enum';
 
 @Injectable()
 export class OrderService {
@@ -80,11 +81,36 @@ export class OrderService {
     }
   }
 
-  findAll() {
-    return `This action returns all order`;
+  async updateStatus(id: number, status: StatusOrder, reason: string) {
+    try {
+      const order = await this.orderRepository.findOneBy({ id: id });
+      console.log('id is :' + id);
+      if (order != null) {
+        order.status = status;
+        order.reasonCanceled = reason;
+        this.orderRepository.save(order);
+        return SuccessResponse();
+      }
+      return NotFoundResponse('Order not found');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findAll() {
+    const order = await this.orderRepository.find({});
+    if (order.length > 0 && order) {
+      return SuccessResponse(order);
+    }
+    return NotFoundResponse('Order not found');
+  }
+
+  async findOne(id: number) {
+    const order = await this.orderRepository.findOneBy({ id: id });
+    if (order) {
+      return SuccessResponse(order);
+    }
+    return NotFoundResponse('Order not found');
   }
 }

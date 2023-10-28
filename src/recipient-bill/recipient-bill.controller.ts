@@ -31,17 +31,4 @@ export class RecipientBillController {
   findOne(@Param('id') id: string) {
     return this.recipientBillService.findOne(+id);
   }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRecipientBillDto: UpdateRecipientBillDto,
-  ) {
-    return this.recipientBillService.update(+id, updateRecipientBillDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recipientBillService.remove(+id);
-  }
 }

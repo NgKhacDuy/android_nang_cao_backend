@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/category/entities/category.entity';
 import { Repository } from 'typeorm';
 import {
+  BadRequestResponse,
   NotFoundResponse,
   SuccessResponse,
 } from 'src/constants/reponse.constants';
@@ -69,19 +70,31 @@ export class RecipientBillService {
     return SuccessResponse();
   }
 
-  findAll() {
-    return `This action returns all recipientBill`;
+  async findAll() {
+    try {
+      const listRecipients = await this.recipientBillRepository.find({});
+      if (listRecipients.length > 0 && listRecipients) {
+        return SuccessResponse(listRecipients);
+      }
+      return NotFoundResponse('Recipient Bill not found');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recipientBill`;
-  }
-
-  update(id: number, updateRecipientBillDto: UpdateRecipientBillDto) {
-    return `This action updates a #${id} recipientBill`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} recipientBill`;
+  async findOne(id: number) {
+    try {
+      const listRecipients = await this.recipientBillRepository.findOneBy({
+        id: id,
+      });
+      if (listRecipients) {
+        return SuccessResponse(listRecipients);
+      }
+      return NotFoundResponse('Recipient Bill not found');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 }

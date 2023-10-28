@@ -19,11 +19,6 @@ export class RecipientDetailController {
     private readonly recipientDetailService: RecipientDetailService,
   ) {}
 
-  @Post()
-  create(@Body() createRecipientDetailDto: CreateRecipientDetailDto) {
-    return this.recipientDetailService.create(createRecipientDetailDto);
-  }
-
   @Get()
   findAll() {
     return this.recipientDetailService.findAll();
@@ -32,18 +27,5 @@ export class RecipientDetailController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.recipientDetailService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRecipientDetailDto: UpdateRecipientDetailDto,
-  ) {
-    return this.recipientDetailService.update(+id, updateRecipientDetailDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recipientDetailService.remove(+id);
   }
 }

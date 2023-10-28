@@ -39,9 +39,4 @@ export class OrderDetailController {
   ) {
     return this.orderDetailService.update(+id, updateOrderDetailDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderDetailService.remove(+id);
-  }
 }

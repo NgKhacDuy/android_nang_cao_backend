@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRecipientDetailDto } from './dto/create-recipient-detail.dto';
 import { UpdateRecipientDetailDto } from './dto/update-recipient-detail.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RecipientDetail } from './entities/recipient-detail.entity';
+import {
+  BadRequestResponse,
+  NotFoundResponse,
+  SuccessResponse,
+} from 'src/constants/reponse.constants';
 
 @Injectable()
 export class RecipientDetailService {
-  create(createRecipientDetailDto: CreateRecipientDetailDto) {
-    return 'This action adds a new recipientDetail';
+  constructor(
+    @InjectRepository(RecipientDetail)
+    private recipientDetailRepository: Repository<RecipientDetail>,
+  ) {}
+  async findAll() {
+    try {
+      const recipient_detail = await this.recipientDetailRepository.find({});
+      if (recipient_detail && recipient_detail.length > 0) {
+        return SuccessResponse(recipient_detail);
+      }
+      return NotFoundResponse('Recipient Detail Not Found');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 
-  findAll() {
-    return `This action returns all recipientDetail`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} recipientDetail`;
-  }
-
-  update(id: number, updateRecipientDetailDto: UpdateRecipientDetailDto) {
-    return `This action updates a #${id} recipientDetail`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} recipientDetail`;
+  async findOne(id: number) {
+    try {
+      const recipient_detail = await this.recipientDetailRepository.findOneBy({
+        id: id,
+      });
+      if (recipient_detail) {
+        return SuccessResponse(recipient_detail);
+      }
+      return NotFoundResponse('Recipient Detail Not Found');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 }
