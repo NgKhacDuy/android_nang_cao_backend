@@ -22,7 +22,7 @@ export class RecipientBill {
   totalMoney: string;
   @OneToMany(
     () => RecipientDetail,
-    (recipientDetail) => recipientDetail.recipientId,
+    (recipientDetail) => recipientDetail.recipient,
   )
   recipientDetail: RecipientDetail[];
 }

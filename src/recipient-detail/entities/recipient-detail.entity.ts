@@ -14,7 +14,7 @@ export class RecipientDetail {
   @PrimaryGeneratedColumn()
   id: number;
   @ManyToOne(() => RecipientBill, (bill) => bill.recipientDetail)
-  recipientId: RecipientBill;
+  recipient: RecipientBill;
   @OneToOne(() => Product)
   @JoinColumn()
   product: Product;
