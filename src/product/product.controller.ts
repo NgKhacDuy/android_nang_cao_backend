@@ -7,12 +7,17 @@ import {
   Param,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import { HttpService } from '@nestjs/axios';
 import * as fs from 'fs';
 import { map } from 'rxjs';
@@ -57,7 +62,7 @@ export class ProductController {
     return this.productService.findName(name);
   }
 
-  @Post('image')
+  @Post('image/:id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -70,39 +75,9 @@ export class ProductController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file', {}))
-  async uploadImage(@UploadedFile() file) {
-    try {
-      let data = new FormData();
-      var successResponse;
-      var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
-        'base64',
-      );
-      const headersRequest = {
-        'Content-Type': 'multipart/form-data;', // afaik this one is not needed
-        Authorization: `Basic ${auth}`,
-      };
-      data.append('file', file.buffer.toString('base64'));
-      data.append('fileName', file.originalname);
-      await axios
-        .request({
-          method: 'POST',
-          maxBodyLength: Infinity,
-          url: process.env.URL_UPLOAD,
-          headers: headersRequest,
-          data: data,
-        })
-        .then((response) => {
-          console.log(response.data['url']);
-          successResponse = response.data['url'];
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      return SuccessResponse(successResponse);
-    } catch (error) {
-      console.log(error);
-      return BadRequestResponse();
-    }
+  @UseInterceptors(AnyFilesInterceptor())
+  uploadImage(@Param('id') id: number, @UploadedFiles() file) {
+    console.log(id);
+    return this.productService.updateProductId(id, file);
   }
 }

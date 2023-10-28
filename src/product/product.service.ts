@@ -6,9 +6,11 @@ import { Like, Not, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  BadRequestResponse,
   NotFoundResponse,
   SuccessResponse,
 } from 'src/constants/reponse.constants';
+import axios from 'axios';
 
 @Injectable()
 export class ProductService {
@@ -74,5 +76,51 @@ export class ProductService {
       return SuccessResponse();
     }
     return NotFoundResponse();
+  }
+
+  async updateProductId(id: number, file: any) {
+    try {
+      const product = await this.productRepository.findOneBy({ id });
+      console.log(product);
+      if (!product) {
+        return NotFoundResponse('Product not found');
+      }
+      var successResponse;
+      let listUrl = [];
+      var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
+        'base64',
+      );
+      const headersRequest = {
+        'Content-Type': 'multipart/form-data;',
+        Authorization: `Basic ${auth}`,
+      };
+      for (let i in file) {
+        let data = new FormData();
+        data.append('file', file[i].buffer.toString('base64'));
+        data.append('fileName', file[i].originalname);
+        await axios
+          .request({
+            method: 'POST',
+            maxBodyLength: Infinity,
+            url: process.env.URL_UPLOAD,
+            headers: headersRequest,
+            data: data,
+          })
+          .then((response) => {
+            console.log(response.data['url']);
+            successResponse = response.data['url'];
+            listUrl.push(successResponse);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      product.img = listUrl;
+      await this.productRepository.save(product);
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 }
