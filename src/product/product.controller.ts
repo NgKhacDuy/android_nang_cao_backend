@@ -11,14 +11,17 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HttpService } from '@nestjs/axios';
 import * as fs from 'fs';
 import { map } from 'rxjs';
 import axios from 'axios';
 import { response } from 'express';
-import { SuccessResponse } from 'src/constants/reponse.constants';
+import {
+  BadRequestResponse,
+  SuccessResponse,
+} from 'src/constants/reponse.constants';
 import { request } from 'http';
 
 @ApiTags('product')
@@ -55,8 +58,20 @@ export class ProductController {
   }
 
   @Post('image')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file', {}))
-  uploadImage(@UploadedFile() file) {
+  async uploadImage(@UploadedFile() file) {
     try {
       let data = new FormData();
       var successResponse;
@@ -69,7 +84,7 @@ export class ProductController {
       };
       data.append('file', file.buffer.toString('base64'));
       data.append('fileName', file.originalname);
-      axios
+      await axios
         .request({
           method: 'POST',
           maxBodyLength: Infinity,
@@ -87,6 +102,7 @@ export class ProductController {
       return SuccessResponse(successResponse);
     } catch (error) {
       console.log(error);
+      return BadRequestResponse();
     }
   }
 }
