@@ -21,6 +21,7 @@ import { AuthorizeRoles } from 'src/utilities/decorators/authorize-roles.decorat
 import { Role } from 'src/utilities/common/user-role.enum';
 import { UserRefreshDto } from './dto/user-refresh.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -70,5 +71,10 @@ export class UserController {
   @Post('refresh')
   async refreshToken(@Body() refreshToken: UserRefreshDto) {
     return await this.userService.refreshToken(refreshToken);
+  }
+
+  @Post('password/:email')
+  resetPassword(@Body() resetPassword: UserResetPasswordDto) {
+    return this.userService.resetPassword(resetPassword);
   }
 }

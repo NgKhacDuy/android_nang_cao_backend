@@ -16,11 +16,14 @@ import { sign, verify } from 'jsonwebtoken';
 import { UserChangePassDto } from './dto/user-changePass.dto';
 import { UserRefreshDto } from './dto/user-refresh.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UserResetPasswordDto } from './dto/user-resetPass.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private mailService: MailService,
   ) {}
 
   async signup(body: UserSignUpDto) {
@@ -133,6 +136,17 @@ export class UserService {
     } catch (error) {
       throw new UnauthorizedException();
     }
+  }
+
+  async resetPassword(resetPassword: UserResetPasswordDto) {
+    const userExist = await this.userRepository.findOneBy({
+      email: resetPassword.email,
+    });
+    if (!userExist) {
+      return NotFoundResponse('Email not exist');
+    }
+    await this.mailService.sendPasswordReset(userExist, resetPassword.email);
+    return SuccessResponse();
   }
 }
 interface JwtPayload {
