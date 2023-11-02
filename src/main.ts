@@ -32,6 +32,6 @@ async function bootstrap() {
     origin: '*',
     credentials: true,
   });
-  await app.listen(80);
+  await app.listen(443);
 }
 bootstrap();
