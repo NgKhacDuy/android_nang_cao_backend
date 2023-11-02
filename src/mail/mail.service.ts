@@ -5,6 +5,7 @@ import { NotFoundResponse } from 'src/constants/reponse.constants';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
+import { Order } from 'src/order/entities/order.entity';
 
 @Injectable()
 export class MailService {
@@ -12,6 +13,8 @@ export class MailService {
     private mailerService: MailerService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>,
   ) {}
 
   async sendPasswordReset(user: User, email: string) {
@@ -29,6 +32,18 @@ export class MailService {
       context: {
         name: user.name,
         url: url,
+      },
+    });
+  }
+
+  async sendOrderInfo(user: User, order: Order) {
+    const url = `127.0.0.1:3000/order`;
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Your order.',
+      template: './order-detail',
+      context: {
+        order: order,
       },
     });
   }

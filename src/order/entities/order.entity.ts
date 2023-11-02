@@ -27,6 +27,6 @@ export class Order {
     default: StatusOrder.WAITING_FOR_ACCEPT,
   })
   status: StatusOrder;
-  @Column()
+  @Column({ default: '' })
   reasonCanceled: string;
 }

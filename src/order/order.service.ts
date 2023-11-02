@@ -15,6 +15,7 @@ import {
   SuccessResponse,
 } from 'src/constants/reponse.constants';
 import { StatusOrder } from 'src/utilities/common/status-order.enum';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class OrderService {
@@ -31,6 +32,7 @@ export class OrderService {
     private cartDetailRepository: Repository<CartDetail>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private mailService: MailService,
   ) {}
   async create(currentUser: User) {
     try {
@@ -63,6 +65,8 @@ export class OrderService {
         orderDetail.product = item[i].product;
         orderDetail.productId = item[i].productId;
         orderDetail.money = product.money;
+        orderDetail.quantity = item[i].quantity;
+        orderDetail.productName = product.name;
         await this.orderDetailRepository.save(orderDetail);
         listOrderDetail.push(orderDetail);
         totalMoney += +product.money * item[i].quantity;
@@ -74,6 +78,8 @@ export class OrderService {
       await this.orderRepository.save(order);
       cartExist.cartDetail = [];
       await this.cartRepository.delete(cartExist.id);
+      await this.cartDetailRepository.remove(cartDetailTemp);
+      await this.mailService.sendOrderInfo(currentUser, order);
       return SuccessResponse();
     } catch (error) {
       console.log(error);

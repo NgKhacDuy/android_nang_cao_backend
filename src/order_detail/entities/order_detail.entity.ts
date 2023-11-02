@@ -26,4 +26,8 @@ export class OrderDetail {
   sale: Sale;
   @Column()
   money: string;
+  @Column()
+  quantity: number;
+  @Column()
+  productName: string;
 }

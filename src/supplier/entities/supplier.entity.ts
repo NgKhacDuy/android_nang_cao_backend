@@ -11,4 +11,6 @@ export class Supplier {
   address: string;
   @OneToMany(() => RecipientBill, (recipient) => recipient.supplier)
   recipientBill: RecipientBill[];
+  @Column({ default: false })
+  isHidden: boolean;
 }

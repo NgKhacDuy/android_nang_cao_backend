@@ -91,7 +91,14 @@ export class CartService {
           cartDetail.productId = createCartDto.product.productId;
           cartDetail.quantity = createCartDto.product.quantity;
           await this.cartDetailRepository.save(cartDetail);
-          cartExist.cartDetail.push(cartDetail);
+          cartExist.cartDetail = [];
+          existCartDetailTemp.push(cartDetail);
+          for (let i in existCartDetailTemp) {
+            cartExist.cartDetail.push(existCartDetailTemp[i]);
+          }
+
+          console.log(cartExist);
+
           await this.cartRepository.save(cartExist);
         }
         return SuccessResponse();

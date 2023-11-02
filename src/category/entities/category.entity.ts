@@ -9,4 +9,6 @@ export class Category {
   name: string;
   @OneToMany(() => Product, (product) => product.category)
   product: Product[];
+  @Column({ default: false })
+  isHidden: boolean;
 }
