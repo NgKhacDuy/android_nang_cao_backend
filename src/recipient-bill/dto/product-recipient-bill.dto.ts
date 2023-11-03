@@ -1,7 +1,8 @@
 export class ProductRecipientBillDto {
   name: string;
   categoryId: number;
-  size: string;
+  size: string[];
+  color: string[];
   description: string;
   benefit: string;
   img: string[];

@@ -5,14 +5,16 @@ export class CreateProductDto {
   categoryId: number;
   @IsString()
   name: string;
-  @IsString()
-  size: string;
+  @IsArray()
+  size: string[];
   @IsString()
   description: string;
   @IsString()
   benefit: string;
   @IsArray()
   img: string[];
+  @IsArray()
+  color: string[];
   @IsString()
   money: string;
   @IsNumber()

@@ -28,8 +28,10 @@ export class Product {
   cartDetail: CartDetail;
   @Column()
   name: string;
-  @Column()
-  size: string;
+  @Column({ type: 'json', default: [] })
+  size: string[];
+  @Column({ type: 'json', default: [] })
+  color: string[];
   @Column()
   description: string;
   @Column()

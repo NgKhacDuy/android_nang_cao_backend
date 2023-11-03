@@ -54,6 +54,7 @@ export class RecipientBillService {
         product.money = createRecipientBillDto.listProduct[i].money;
         product.quantity = createRecipientBillDto.listProduct[i].quantity;
         product.size = createRecipientBillDto.listProduct[i].size;
+        product.color = createRecipientBillDto.listProduct[i].color;
         product.category = categoryExist;
         await this.productRepository.save(product);
         recipientDetail.product = product;
