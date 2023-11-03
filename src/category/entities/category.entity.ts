@@ -11,4 +11,8 @@ export class Category {
   product: Product[];
   @Column({ default: false })
   isHidden: boolean;
+  @Column({ default: '' })
+  title: string;
+  @Column({ default: '' })
+  subTitle: string;
 }
