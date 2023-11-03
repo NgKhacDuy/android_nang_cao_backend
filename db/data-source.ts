@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 config();
 
 export const dataSourceOptions: DataSourceOptions = {
-  type: 'mysql',
+  type: 'postgres',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USER,
@@ -13,6 +13,8 @@ export const dataSourceOptions: DataSourceOptions = {
   migrations: ['dist/db/migrations/*{ts,.js}'],
   synchronize: true,
   logging: false,
+  url: process.env.DB_URL,
+  ssl: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);

@@ -6,7 +6,7 @@ export class Sale {
   id: number;
   @Column()
   name: string;
-  @Column({ type: 'double' })
+  @Column({ type: 'double precision' })
   percent: number;
   @Column()
   dateStart: Date;
