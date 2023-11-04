@@ -108,7 +108,7 @@ export class UserService {
 
   async accessToken(user: User) {
     return sign(
-      { id: user.id, username: user.username },
+      { id: user.id, username: user.username, role: user.roles },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME },
     );
