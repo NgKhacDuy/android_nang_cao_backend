@@ -30,7 +30,7 @@ export class MailService {
       template: './reset-password',
 
       context: {
-        name: user.name,
+        name: user.firstName + ' ' + user.lastName,
         url: url,
       },
     });

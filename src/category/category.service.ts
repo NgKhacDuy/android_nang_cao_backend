@@ -3,18 +3,21 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Like, Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import {
   BadRequestResponse,
   NotFoundResponse,
   SuccessResponse,
 } from 'src/constants/reponse.constants';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
   ) {}
   async create(createCategoryDto: CreateCategoryDto) {
     try {
@@ -53,12 +56,25 @@ export class CategoryService {
   async findName(name: string) {
     const category = await this.categoryRepository.find({
       where: {
-        name: Like(`%${name}%`),
+        name: ILike(`%${name}%`),
       },
     });
     if (category == null || category.length === 0) {
       return NotFoundResponse();
     }
+    return SuccessResponse(category);
+  }
+
+  async findSlug(slug: string) {
+    const category = await this.categoryRepository.findOneBy({ slug: slug });
+    if (category == null) {
+      return NotFoundResponse();
+    }
+    const product = await this.productRepository
+      .createQueryBuilder('product')
+      .where('product.categoryId=:categoryId', { categoryId: category.id })
+      .getMany();
+    category.product = product;
     return SuccessResponse(category);
   }
 

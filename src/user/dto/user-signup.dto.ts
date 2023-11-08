@@ -10,5 +10,12 @@ export class UserSignUpDto {
   @IsEmail()
   email: string;
   @IsNotEmpty()
-  name: string;
+  @IsString()
+  firstName: string;
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string;
 }

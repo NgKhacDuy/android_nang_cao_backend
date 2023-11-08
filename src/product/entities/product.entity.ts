@@ -44,4 +44,6 @@ export class Product {
   quantity: number;
   @Column({ default: true })
   isShow: boolean;
+  @Column({ default: '' })
+  slug: string;
 }

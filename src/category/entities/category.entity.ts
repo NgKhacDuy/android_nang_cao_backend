@@ -15,4 +15,6 @@ export class Category {
   title: string;
   @Column({ default: '' })
   subTitle: string;
+  @Column({ default: '' })
+  slug: string;
 }

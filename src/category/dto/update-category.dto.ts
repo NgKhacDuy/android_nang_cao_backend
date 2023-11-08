@@ -10,4 +10,7 @@ export class UpdateCategoryDto {
   @IsNotEmpty()
   @IsString()
   subTitle: string;
+  @IsNotEmpty()
+  @IsString()
+  slug: string;
 }

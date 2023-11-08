@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Category } from 'src/category/entities/category.entity';
-import { Like, Not, Repository } from 'typeorm';
+import { ILike, Like, Not, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -55,10 +55,20 @@ export class ProductService {
   async findName(name: string) {
     const product = await this.productRepository.find({
       where: {
-        name: Like(`%${name}%`),
+        name: ILike(`%${name}%`),
       },
     });
     if (product == null || product.length === 0) {
+      return NotFoundResponse();
+    }
+    return SuccessResponse(product);
+  }
+
+  async findSlug(slug: string) {
+    const product = await this.productRepository.findOneBy({
+      slug: slug,
+    });
+    if (product == null) {
       return NotFoundResponse();
     }
     return SuccessResponse(product);

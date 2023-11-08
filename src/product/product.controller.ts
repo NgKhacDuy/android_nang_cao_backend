@@ -62,6 +62,11 @@ export class ProductController {
     return this.productService.findName(name);
   }
 
+  @Get('slug/:slug')
+  findSlug(@Param('slug') slug: string) {
+    return this.productService.findSlug(slug);
+  }
+
   @Post('image/:id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({

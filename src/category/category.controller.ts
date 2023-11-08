@@ -37,6 +37,11 @@ export class CategoryController {
     return this.categoryService.findName(name);
   }
 
+  @Get('slug/:slug')
+  findSlug(@Param('slug') slug: string) {
+    return this.categoryService.findSlug(slug);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: number,

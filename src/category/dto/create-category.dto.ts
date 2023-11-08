@@ -10,4 +10,7 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   @IsString()
   subTitle: string;
+  @IsNotEmpty()
+  @IsString()
+  slug: string;
 }

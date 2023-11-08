@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
@@ -76,8 +76,17 @@ export class UserService {
   }
 
   async findName(name: string) {
-    const user = await this.userRepository.findOneBy({ name });
-    if (user === null) {
+    const user = await this.userRepository.find({
+      where: [
+        {
+          lastName: ILike(`%${name}%`),
+        },
+        {
+          firstName: ILike(`%${name}%`),
+        },
+      ],
+    });
+    if (user === null || user.length === 0) {
       return NotFoundResponse();
     }
     return SuccessResponse(user);
