@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { GENDER } from 'src/utilities/common/user-gender.enum';
 
 export class UpdateUserDto {
   @IsNotEmpty()
@@ -8,4 +9,7 @@ export class UpdateUserDto {
   name: string;
   @IsString()
   phoneNumber: string;
+  @IsNotEmpty()
+  @IsEnum(GENDER)
+  gender: GENDER;
 }

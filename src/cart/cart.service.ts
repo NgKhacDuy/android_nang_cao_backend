@@ -117,6 +117,11 @@ export class CartService {
       if (!cartExist) {
         return NotFoundResponse('Cart not found');
       }
+      const cartDetail = await this.cartDetailRepository
+        .createQueryBuilder('cart_detail')
+        .where('cart_detail.cartId=:cartId', { cartId: cartExist.id })
+        .getMany();
+      cartExist.cartDetail = cartDetail;
       return SuccessResponse(cartExist);
     } catch (error) {}
   }

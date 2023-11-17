@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { GENDER } from 'src/utilities/common/user-gender.enum';
 
 export class UserSignUpDto {
   @IsNotEmpty()
@@ -18,4 +19,7 @@ export class UserSignUpDto {
   @IsNotEmpty()
   @IsString()
   phoneNumber: string;
+  @IsNotEmpty()
+  @IsEnum(GENDER)
+  gender: GENDER;
 }
