@@ -29,4 +29,6 @@ export class Order {
   status: StatusOrder;
   @Column({ default: '' })
   reasonCanceled: string;
+  @Column({ default: '' })
+  address: string;
 }
