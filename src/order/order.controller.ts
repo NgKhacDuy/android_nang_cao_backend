@@ -23,8 +23,8 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  create(@CurrentUser() currentUser: User) {
-    return this.orderService.create(currentUser);
+  create(@CurrentUser() currentUser: User, @Body() dto: CreateOrderDto) {
+    return this.orderService.create(currentUser, dto);
   }
 
   @ApiQuery({ name: 'status', enum: StatusOrder })

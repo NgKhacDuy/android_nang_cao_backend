@@ -34,7 +34,7 @@ export class OrderService {
     private userRepository: Repository<User>,
     private mailService: MailService,
   ) {}
-  async create(currentUser: User) {
+  async create(currentUser: User, dto: CreateOrderDto) {
     try {
       const userExist = await this.userRepository.findOneBy({
         id: currentUser.id,
@@ -75,6 +75,7 @@ export class OrderService {
       order.totalMoney = totalMoney.toString();
       order.dateCreate = new Date();
       order.user = currentUser;
+      order.address = dto.address;
       await this.orderRepository.save(order);
       cartExist.cartDetail = [];
       await this.cartRepository.delete(cartExist.id);
