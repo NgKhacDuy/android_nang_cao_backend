@@ -121,7 +121,19 @@ export class CartService {
         .createQueryBuilder('cart_detail')
         .where('cart_detail.cartId=:cartId', { cartId: cartExist.id })
         .getMany();
+      await Promise.all(
+        cartDetail.map(async (element) => {
+          const product = await this.productRepository.findBy({
+            id: element.productId,
+          });
+          if (product) {
+            console.log(element.product);
+            element.product = product;
+          }
+        }),
+      );
       cartExist.cartDetail = cartDetail;
+
       return SuccessResponse(cartExist);
     } catch (error) {}
   }

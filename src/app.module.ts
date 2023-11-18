@@ -16,6 +16,7 @@ import { CartModule } from './cart/cart.module';
 import { CartDetailModule } from './cart_detail/cart_detail.module';
 import { MailModule } from './mail/mail.module';
 import { AddressModule } from './address/address.module';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AddressModule } from './address/address.module';
     CartDetailModule,
     MailModule,
     AddressModule,
+    StatisticsModule,
   ],
   controllers: [],
   providers: [],
