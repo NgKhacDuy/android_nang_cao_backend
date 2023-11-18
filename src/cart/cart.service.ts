@@ -53,6 +53,8 @@ export class CartService {
         cartDetail.product.push(productExist);
         cartDetail.productId = createCartDto.product.productId;
         cartDetail.quantity = createCartDto.product.quantity;
+        cartDetail.color = createCartDto.color;
+        cartDetail.size = createCartDto.size;
         await this.cartDetailRepository.save(cartDetail);
         listDetail.push(cartDetail);
         newCart.cartDetail = listDetail;
@@ -79,25 +81,31 @@ export class CartService {
           (productExist) =>
             productExist.productId === createCartDto.product.productId,
         );
-        if (existCartDetail) {
-          existCartDetail.quantity = createCartDto.product.quantity;
-          await this.cartDetailRepository.update(existCartDetail.id, {
+        const existCartDetailColor = existCartDetailTemp.find(
+          (element) => element.color == createCartDto.color,
+        );
+        if (existCartDetail && typeof existCartDetailColor !== 'undefined') {
+          console.log(true);
+          existCartDetail.quantity =
+            existCartDetailColor.quantity + createCartDto.product.quantity;
+          await this.cartDetailRepository.update(existCartDetailColor.id, {
             quantity: existCartDetail.quantity,
           });
         } else {
           // cartDetail.money = createCartDto.product.money;
+          console.log(false);
           cartDetail.product = [];
           cartDetail.product.push(productExist);
           cartDetail.productId = createCartDto.product.productId;
           cartDetail.quantity = createCartDto.product.quantity;
+          cartDetail.color = createCartDto.color;
+          cartDetail.size = createCartDto.size;
           await this.cartDetailRepository.save(cartDetail);
           cartExist.cartDetail = [];
           existCartDetailTemp.push(cartDetail);
           for (let i in existCartDetailTemp) {
             cartExist.cartDetail.push(existCartDetailTemp[i]);
           }
-
-          console.log(cartExist);
 
           await this.cartRepository.save(cartExist);
         }

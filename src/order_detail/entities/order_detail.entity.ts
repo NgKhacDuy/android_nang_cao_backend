@@ -30,4 +30,8 @@ export class OrderDetail {
   quantity: number;
   @Column()
   productName: string;
+  @Column({ default: '' })
+  size: string;
+  @Column({ default: '' })
+  color: string;
 }

@@ -7,4 +7,10 @@ export class CreateCartDto {
   // @IsNotEmpty()
   // @IsString()
   // totalMoney: string;
+  @IsNotEmpty()
+  @IsString()
+  size: string;
+  @IsNotEmpty()
+  @IsString()
+  color: string;
 }
