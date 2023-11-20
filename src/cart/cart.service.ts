@@ -85,7 +85,6 @@ export class CartService {
           (element) => element.color == createCartDto.color,
         );
         if (existCartDetail && typeof existCartDetailColor !== 'undefined') {
-          console.log(true);
           existCartDetail.quantity =
             existCartDetailColor.quantity + createCartDto.product.quantity;
           await this.cartDetailRepository.update(existCartDetailColor.id, {
@@ -93,7 +92,6 @@ export class CartService {
           });
         } else {
           // cartDetail.money = createCartDto.product.money;
-          console.log(false);
           cartDetail.product = [];
           cartDetail.product.push(productExist);
           cartDetail.productId = createCartDto.product.productId;
@@ -135,7 +133,6 @@ export class CartService {
             id: element.productId,
           });
           if (product) {
-            console.log(element.product);
             element.product = product;
           }
         }),

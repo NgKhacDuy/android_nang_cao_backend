@@ -93,7 +93,6 @@ export class OrderService {
   async updateStatus(id: number, status: StatusOrder, reason: string) {
     try {
       const order = await this.orderRepository.findOneBy({ id: id });
-      console.log('id is :' + id);
       if (order != null) {
         order.status = status;
         order.reasonCanceled = reason;

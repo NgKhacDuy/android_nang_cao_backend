@@ -82,7 +82,6 @@ export class ProductController {
   })
   @UseInterceptors(AnyFilesInterceptor())
   uploadImage(@Param('id') id: number, @UploadedFiles() file) {
-    console.log(id);
     return this.productService.updateProductId(id, file);
   }
 }

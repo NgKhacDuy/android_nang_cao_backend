@@ -91,7 +91,6 @@ export class ProductService {
   async updateProductId(id: number, file: any) {
     try {
       const product = await this.productRepository.findOneBy({ id });
-      console.log(product);
       if (!product) {
         return NotFoundResponse('Product not found');
       }
@@ -117,7 +116,6 @@ export class ProductService {
             data: data,
           })
           .then((response) => {
-            console.log(response.data['url']);
             successResponse = response.data['url'];
             listUrl.push(successResponse);
           })

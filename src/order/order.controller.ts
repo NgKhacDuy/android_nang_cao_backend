@@ -34,7 +34,6 @@ export class OrderController {
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
     @Query('status') status: StatusOrder = StatusOrder.WAITING_FOR_ACCEPT,
   ) {
-    console.log(id);
     return this.orderService.updateStatus(
       id,
       status,
