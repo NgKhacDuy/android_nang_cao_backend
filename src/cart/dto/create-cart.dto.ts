@@ -9,8 +9,5 @@ export class CreateCartDto {
   // totalMoney: string;
   @IsNotEmpty()
   @IsString()
-  size: string;
-  @IsNotEmpty()
-  @IsString()
   color: string;
 }

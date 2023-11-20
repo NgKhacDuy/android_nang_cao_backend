@@ -68,7 +68,7 @@ export class OrderService {
         orderDetail.quantity = item[i].quantity;
         orderDetail.productName = product.name;
         orderDetail.color = item[i].color;
-        orderDetail.size = item[i].size;
+
         await this.orderDetailRepository.save(orderDetail);
         listOrderDetail.push(orderDetail);
         totalMoney += +product.money * item[i].quantity;

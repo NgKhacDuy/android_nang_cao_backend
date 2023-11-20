@@ -25,8 +25,7 @@ export class CartDetail {
   productId: number;
   @Column()
   quantity: number;
-  @Column({ default: '' })
-  size: string;
+
   @Column({ default: '' })
   color: string;
 }

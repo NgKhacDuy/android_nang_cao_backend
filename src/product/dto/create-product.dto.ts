@@ -5,8 +5,6 @@ export class CreateProductDto {
   categoryId: number;
   @IsString()
   name: string;
-  @IsArray()
-  size: string[];
   @IsString()
   description: string;
   @IsString()

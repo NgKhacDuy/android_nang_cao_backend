@@ -54,7 +54,7 @@ export class CartService {
         cartDetail.productId = createCartDto.product.productId;
         cartDetail.quantity = createCartDto.product.quantity;
         cartDetail.color = createCartDto.color;
-        cartDetail.size = createCartDto.size;
+
         await this.cartDetailRepository.save(cartDetail);
         listDetail.push(cartDetail);
         newCart.cartDetail = listDetail;
@@ -99,7 +99,7 @@ export class CartService {
           cartDetail.productId = createCartDto.product.productId;
           cartDetail.quantity = createCartDto.product.quantity;
           cartDetail.color = createCartDto.color;
-          cartDetail.size = createCartDto.size;
+
           await this.cartDetailRepository.save(cartDetail);
           cartExist.cartDetail = [];
           existCartDetailTemp.push(cartDetail);

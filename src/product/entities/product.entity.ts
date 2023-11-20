@@ -29,8 +29,6 @@ export class Product {
   @Column()
   name: string;
   @Column({ type: 'json', default: [] })
-  size: string[];
-  @Column({ type: 'json', default: [] })
   color: string[];
   @Column()
   description: string;
