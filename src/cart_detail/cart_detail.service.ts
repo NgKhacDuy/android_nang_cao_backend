@@ -64,16 +64,16 @@ export class CartDetailService {
         return NotFoundResponse('User not found');
       }
 
-      const productExistInCart = cartExist.cartDetail.find(
-        (cart) => cart.productId === updateQuantityCartDto.productId,
-      );
-      if (!productExistInCart) {
-        return NotFoundResponse('Product not found in cart');
-      }
+      // const productExistInCart = cartExist.cartDetail.find(
+      //   (cart) => cart.productId === updateQuantityCartDto.productId,
+      // );
+      // if (!productExistInCart) {
+      //   return NotFoundResponse('Product not found in cart');
+      // }
 
-      productExistInCart.quantity = updateQuantityCartDto.quantity;
-      await this.cartDetailRepository.update(productExistInCart.id, {
-        quantity: productExistInCart.quantity,
+      // productExistInCart.quantity = updateQuantityCartDto.quantity;
+      await this.cartDetailRepository.update(updateQuantityCartDto.id, {
+        quantity: updateQuantityCartDto.quantity,
       });
 
       return SuccessResponse();
@@ -91,29 +91,25 @@ export class CartDetailService {
       const cartExist = await this.cartRepository.findOneBy({
         userId: currentUser.id,
       });
-      const productExist = await this.productRepository.findOneBy({
+
+      const cartDetail = await this.cartDetailRepository.findOneBy({
         id: id,
       });
-      if (!productExist) {
-        return NotFoundResponse('Product not found');
-      }
 
       if (!cartExist) {
         return NotFoundResponse('Cart not found');
+      }
+
+      if (!cartDetail) {
+        return NotFoundResponse('Cart detail not found');
       }
 
       if (!userExist) {
         return NotFoundResponse('User not found');
       }
 
-      const productExistInCart = cartExist.cartDetail.find(
-        (cart) => cart.productId == id,
-      );
-      if (!productExistInCart) {
-        return NotFoundResponse('Product not found in cart');
-      }
       await this.cartDetailRepository.delete({
-        productId: id,
+        id: id,
       });
       return SuccessResponse();
     } catch (error) {

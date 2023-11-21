@@ -24,7 +24,7 @@ export class CartDetailController {
   constructor(private readonly cartDetailService: CartDetailService) {}
 
   @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
-  @Patch('quantity/:quantity')
+  @Patch('quantity/')
   update(
     @CurrentUser() currentUser: User,
     @Body() updateQuantityCartDto: UpdateQuantityCartDto,
@@ -33,11 +33,8 @@ export class CartDetailController {
   }
 
   @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
-  @Delete(':productId')
-  remove(
-    @CurrentUser() currentUser: User,
-    @Param('productId') productId: number,
-  ) {
-    return this.cartDetailService.remove(currentUser, productId);
+  @Delete(':id')
+  remove(@CurrentUser() currentUser: User, @Param('id') id: number) {
+    return this.cartDetailService.remove(currentUser, id);
   }
 }

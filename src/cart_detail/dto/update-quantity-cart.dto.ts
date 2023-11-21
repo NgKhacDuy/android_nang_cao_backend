@@ -7,4 +7,7 @@ export class UpdateQuantityCartDto {
   @IsNumber()
   @IsNotEmpty()
   quantity: number;
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
 }
