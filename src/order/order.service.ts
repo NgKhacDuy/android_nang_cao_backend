@@ -8,7 +8,7 @@ import { Cart } from 'src/cart/entities/cart.entity';
 import { CartDetail } from 'src/cart_detail/entities/cart_detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import {
   BadRequestResponse,
   NotFoundResponse,
@@ -109,6 +109,25 @@ export class OrderService {
   async findAll() {
     const order = await this.orderRepository.find({});
     if (order.length > 0 && order) {
+      await Promise.all(
+        order.map(async (element) => {
+          const orderDetail = await this.orderDetailRepository.find({
+            where: {
+              order: element,
+            } as FindOptionsWhere<Order>,
+          });
+
+          await Promise.all(
+            orderDetail.map(async (iterator) => {
+              const product = await this.productRepository.findBy({
+                id: iterator.productId,
+              });
+              iterator.product = product;
+            }),
+          );
+          element.orderDetail = orderDetail;
+        }),
+      );
       return SuccessResponse(order);
     }
     return NotFoundResponse('Order not found');
@@ -117,6 +136,20 @@ export class OrderService {
   async findOne(id: number) {
     const order = await this.orderRepository.findOneBy({ id: id });
     if (order) {
+      const orderDetail = await this.orderDetailRepository.find({
+        where: {
+          order: order,
+        } as FindOptionsWhere<Order>,
+      });
+      await Promise.all(
+        orderDetail.map(async (iterator) => {
+          const product = await this.productRepository.findBy({
+            id: iterator.productId,
+          });
+          iterator.product = product;
+        }),
+      );
+      order.orderDetail = orderDetail;
       return SuccessResponse(order);
     }
     return NotFoundResponse('Order not found');
