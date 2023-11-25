@@ -1,5 +1,11 @@
 import { RecipientBill } from 'src/recipient-bill/entities/recipient-bill.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('supplier')
 export class Supplier {
@@ -11,6 +17,6 @@ export class Supplier {
   address: string;
   @OneToMany(() => RecipientBill, (recipient) => recipient.supplier)
   recipientBill: RecipientBill[];
-  @Column({ default: false })
-  isHidden: boolean;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

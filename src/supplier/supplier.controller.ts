@@ -44,4 +44,9 @@ export class SupplierController {
   findName(@Param('name') name: string) {
     return this.supplierService.findName(name);
   }
+
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.supplierService.delete(id);
+  }
 }

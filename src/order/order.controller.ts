@@ -41,9 +41,9 @@ export class OrderController {
     );
   }
 
-  @Get()
-  findAll() {
-    return this.orderService.findAll();
+  @Get('all/:page')
+  findAll(@Param('page') page: number) {
+    return this.orderService.findAll(page);
   }
 
   @Get(':id')

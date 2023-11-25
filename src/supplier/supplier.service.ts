@@ -66,4 +66,18 @@ export class SupplierService {
     }
     return NotFoundResponse();
   }
+
+  async delete(id: number) {
+    try {
+      const supplier = await this.supplierRepository.findOneBy({ id: id });
+      if (!supplier) {
+        return NotFoundResponse();
+      }
+      await this.supplierRepository.softDelete({ id: id });
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
+  }
 }

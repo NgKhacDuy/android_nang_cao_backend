@@ -16,8 +16,8 @@ export const SigninResponse = (
   statusCode: HttpStatus.OK,
 });
 
-export const BadRequestResponse = () => ({
-  message: '',
+export const BadRequestResponse = (message: string = null) => ({
+  message: message,
   statusCode: HttpStatus.BAD_REQUEST,
 });
 

@@ -5,6 +5,7 @@ import { Role } from 'src/utilities/common/user-role.enum';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -38,4 +39,6 @@ export class User {
   address: Address[];
   @Column({ default: '' })
   phoneNumber: string;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

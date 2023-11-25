@@ -106,8 +106,14 @@ export class OrderService {
     }
   }
 
-  async findAll() {
-    const order = await this.orderRepository.find({});
+  async findAll(page: number) {
+    if (page <= 0) {
+      return BadRequestResponse('Page must be greater than zero');
+    }
+    const [order, total] = await this.orderRepository.findAndCount({
+      take: 10,
+      skip: page - 1 || 0,
+    });
     if (order.length > 0 && order) {
       await Promise.all(
         order.map(async (element) => {
@@ -128,7 +134,7 @@ export class OrderService {
           element.orderDetail = orderDetail;
         }),
       );
-      return SuccessResponse(order);
+      return SuccessResponse({ order, count: total });
     }
     return NotFoundResponse('Order not found');
   }

@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UploadedFiles,
+  Delete,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -47,6 +48,11 @@ export class ProductController {
     return this.productService.findAll();
   }
 
+  @Get('admin/:page')
+  findAllAdmin(@Param('page') page: number) {
+    return this.productService.findAllAdmin(page);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
@@ -83,5 +89,10 @@ export class ProductController {
   @UseInterceptors(AnyFilesInterceptor())
   uploadImage(@Param('id') id: number, @UploadedFiles() file) {
     return this.productService.updateProductId(id, file);
+  }
+
+  @Delete(':id')
+  deleteProductId(@Param('id') id: number) {
+    return this.productService.deleteProductId(id);
   }
 }

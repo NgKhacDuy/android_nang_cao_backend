@@ -45,7 +45,7 @@ export class UserService {
       .addSelect('users.password')
       .where('users.username=:username', { username: body.username })
       .getOne();
-    if (!userExists) return BadRequestResponse();
+    if (!userExists) return NotFoundResponse('User not found');
     const matchPassword = await compare(body.password, userExists.password);
     if (!matchPassword) return BadRequestResponse();
     delete userExists.password;
@@ -156,6 +156,20 @@ export class UserService {
     }
     await this.mailService.sendPasswordReset(userExist, resetPassword.email);
     return SuccessResponse();
+  }
+
+  async delete(id: number) {
+    try {
+      const user = await this.userRepository.findOneBy({ id: id });
+      if (!user) {
+        return NotFoundResponse('User not found');
+      }
+      await this.userRepository.softDelete({ id: id });
+      return SuccessResponse('User deleted');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
   }
 }
 interface JwtPayload {

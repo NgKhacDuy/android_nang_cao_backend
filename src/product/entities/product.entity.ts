@@ -6,6 +6,7 @@ import { Role } from 'src/utilities/common/user-role.enum';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -44,4 +45,6 @@ export class Product {
   isShow: boolean;
   @Column({ default: '' })
   slug: string;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

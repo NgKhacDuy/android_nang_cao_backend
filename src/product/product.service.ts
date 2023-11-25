@@ -44,6 +44,24 @@ export class ProductService {
     }
   }
 
+  async findAllAdmin(page: number) {
+    try {
+      if (page <= 0) {
+        return BadRequestResponse('Page must be greater than zero');
+      }
+      const [product, total] = await this.productRepository.findAndCount({
+        take: 1,
+        skip: page - 1 || 0,
+      });
+      if (product && product.length > 0) {
+        return SuccessResponse({ product, count: total });
+      }
+      return NotFoundResponse();
+    } catch (error) {
+      return error.message;
+    }
+  }
+
   async findOne(id: number) {
     const product = await this.productRepository.findOneBy({ id });
     if (product == null) {
@@ -125,6 +143,20 @@ export class ProductService {
       }
       product.img = listUrl;
       await this.productRepository.save(product);
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
+  }
+  async deleteProductId(id: number) {
+    try {
+      const product = await this.productRepository.findOneBy({ id: id });
+      if (product) {
+        await this.productRepository.softDelete({ id: id });
+      } else {
+        return NotFoundResponse('Product not found');
+      }
       return SuccessResponse();
     } catch (error) {
       console.log(error);

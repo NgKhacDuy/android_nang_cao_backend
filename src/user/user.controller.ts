@@ -77,4 +77,9 @@ export class UserController {
   resetPassword(@Body() resetPassword: UserResetPasswordDto) {
     return this.userService.resetPassword(resetPassword);
   }
+
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.userService.delete(id);
+  }
 }
