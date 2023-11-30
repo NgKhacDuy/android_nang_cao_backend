@@ -28,6 +28,7 @@ export class ProductService {
     if (!categoryExist) return NotFoundResponse();
     const product = this.productRepository.create(createProductDto);
     product.category = categoryExist;
+    product.color = eval(createProductDto.color[0]);
     var successResponse;
     let listUrl = [];
     var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
@@ -122,7 +123,12 @@ export class ProductService {
     return SuccessResponse(product);
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto, file: any) {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+    file: any,
+    isChangeImg: boolean,
+  ) {
     const productExist = await this.productRepository.findOneBy({ id });
     const categoryExist = await this.categoryRepository.findOneBy({
       id: updateProductDto.categoryId,
@@ -130,36 +136,39 @@ export class ProductService {
     if (productExist !== null && categoryExist !== null) {
       const product = this.productRepository.create(updateProductDto);
       product.category = categoryExist;
-      var successResponse;
-      let listUrl = [];
-      var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
-        'base64',
-      );
-      const headersRequest = {
-        'Content-Type': 'multipart/form-data;',
-        Authorization: `Basic ${auth}`,
-      };
-      for (let i in file) {
-        let data = new FormData();
-        data.append('file', file[i].buffer.toString('base64'));
-        data.append('fileName', file[i].originalname);
-        await axios
-          .request({
-            method: 'POST',
-            maxBodyLength: Infinity,
-            url: process.env.URL_UPLOAD,
-            headers: headersRequest,
-            data: data,
-          })
-          .then((response) => {
-            successResponse = response.data['url'];
-            listUrl.push(successResponse);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+      if (isChangeImg === true) {
+        var successResponse;
+        let listUrl = [];
+        var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
+          'base64',
+        );
+        const headersRequest = {
+          'Content-Type': 'multipart/form-data;',
+          Authorization: `Basic ${auth}`,
+        };
+        for (let i in file) {
+          let data = new FormData();
+          data.append('file', file[i].buffer.toString('base64'));
+          data.append('fileName', file[i].originalname);
+          await axios
+            .request({
+              method: 'POST',
+              maxBodyLength: Infinity,
+              url: process.env.URL_UPLOAD,
+              headers: headersRequest,
+              data: data,
+            })
+            .then((response) => {
+              successResponse = response.data['url'];
+              listUrl.push(successResponse);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        product.img = listUrl;
       }
-      product.img = listUrl;
+      product.color = eval(updateProductDto.color[0]);
       await this.productRepository.update(id, product);
       return SuccessResponse();
     }

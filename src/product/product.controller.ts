@@ -14,6 +14,7 @@ import {
   NestInterceptor,
   Type,
   mixin,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -76,10 +77,11 @@ export class ProductController {
   @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
   update(
     @Param('id') id: string,
+    @Query('isChangeImg') isChangeImg: boolean,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() file,
   ) {
-    return this.productService.update(+id, updateProductDto, file);
+    return this.productService.update(+id, updateProductDto, file, isChangeImg);
   }
 
   @Get('name/:name')
