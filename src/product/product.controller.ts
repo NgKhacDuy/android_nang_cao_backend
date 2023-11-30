@@ -9,11 +9,16 @@ import {
   UploadedFile,
   UploadedFiles,
   Delete,
+  CallHandler,
+  ExecutionContext,
+  NestInterceptor,
+  Type,
+  mixin,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import {
   AnyFilesInterceptor,
   FileInterceptor,
@@ -21,7 +26,7 @@ import {
 } from '@nestjs/platform-express';
 import { HttpService } from '@nestjs/axios';
 import * as fs from 'fs';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import axios from 'axios';
 import { response } from 'express';
 import {
@@ -29,6 +34,10 @@ import {
   SuccessResponse,
 } from 'src/constants/reponse.constants';
 import { request } from 'http';
+import {
+  ApiImplicitFormData,
+  FileToBodyInterceptor,
+} from 'src/utilities/decorators/api-implicit-form-data.decorator';
 
 @ApiTags('product')
 @Controller('product')
@@ -39,8 +48,12 @@ export class ProductController {
   ) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
+  create(@Body() body: CreateProductDto, @UploadedFiles() file) {
+    console.log(body.benefit);
+    console.log(file);
+    return this.productService.create(body, file);
   }
 
   @Get()
@@ -59,8 +72,14 @@ export class ProductController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() file,
+  ) {
+    return this.productService.update(+id, updateProductDto, file);
   }
 
   @Get('name/:name')
@@ -79,9 +98,12 @@ export class ProductController {
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
+        ['files']: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
         },
       },
     },
@@ -95,4 +117,26 @@ export class ProductController {
   deleteProductId(@Param('id') id: number) {
     return this.productService.deleteProductId(id);
   }
+}
+
+export function JsonToObjectsInterceptor(
+  fields: string[],
+): Type<NestInterceptor> {
+  class JsonToObjectsInterceptorClass implements NestInterceptor {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+      const request = context.switchToHttp().getRequest();
+      console.log(request.body);
+      if (request.body) {
+        fields.forEach((field) => {
+          if (request.body[field]) {
+            request.body[field] = JSON.parse(request.body[field]);
+            console.log(request.body);
+          }
+        });
+      }
+      return next.handle();
+    }
+  }
+  const Interceptor = mixin(JsonToObjectsInterceptorClass);
+  return Interceptor as Type<NestInterceptor>;
 }

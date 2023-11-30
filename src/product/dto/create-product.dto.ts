@@ -1,7 +1,14 @@
-import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsNumberString,
+  IsString,
+} from 'class-validator';
 
 export class CreateProductDto {
-  @IsNumber()
+  @IsNumberString()
   categoryId: number;
   @IsString()
   name: string;
@@ -10,12 +17,10 @@ export class CreateProductDto {
   @IsString()
   benefit: string;
   @IsArray()
-  img: string[];
-  @IsArray()
   color: string[];
   @IsString()
   money: string;
-  @IsNumber()
+  @IsNumberString()
   quantity: number;
   @IsNotEmpty()
   @IsString()

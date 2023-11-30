@@ -21,13 +21,43 @@ export class ProductService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, file: any) {
     const categoryExist = await this.categoryRepository.findOneBy({
       id: createProductDto.categoryId,
     });
     if (!categoryExist) return NotFoundResponse();
     const product = this.productRepository.create(createProductDto);
     product.category = categoryExist;
+    var successResponse;
+    let listUrl = [];
+    var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
+      'base64',
+    );
+    const headersRequest = {
+      'Content-Type': 'multipart/form-data;',
+      Authorization: `Basic ${auth}`,
+    };
+    for (let i in file) {
+      let data = new FormData();
+      data.append('file', file[i].buffer.toString('base64'));
+      data.append('fileName', file[i].originalname);
+      await axios
+        .request({
+          method: 'POST',
+          maxBodyLength: Infinity,
+          url: process.env.URL_UPLOAD,
+          headers: headersRequest,
+          data: data,
+        })
+        .then((response) => {
+          successResponse = response.data['url'];
+          listUrl.push(successResponse);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    product.img = listUrl;
     await this.productRepository.save(product);
     return SuccessResponse();
   }
@@ -92,7 +122,7 @@ export class ProductService {
     return SuccessResponse(product);
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
+  async update(id: number, updateProductDto: UpdateProductDto, file: any) {
     const productExist = await this.productRepository.findOneBy({ id });
     const categoryExist = await this.categoryRepository.findOneBy({
       id: updateProductDto.categoryId,
@@ -100,6 +130,36 @@ export class ProductService {
     if (productExist !== null && categoryExist !== null) {
       const product = this.productRepository.create(updateProductDto);
       product.category = categoryExist;
+      var successResponse;
+      let listUrl = [];
+      var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
+        'base64',
+      );
+      const headersRequest = {
+        'Content-Type': 'multipart/form-data;',
+        Authorization: `Basic ${auth}`,
+      };
+      for (let i in file) {
+        let data = new FormData();
+        data.append('file', file[i].buffer.toString('base64'));
+        data.append('fileName', file[i].originalname);
+        await axios
+          .request({
+            method: 'POST',
+            maxBodyLength: Infinity,
+            url: process.env.URL_UPLOAD,
+            headers: headersRequest,
+            data: data,
+          })
+          .then((response) => {
+            successResponse = response.data['url'];
+            listUrl.push(successResponse);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      product.img = listUrl;
       await this.productRepository.update(id, product);
       return SuccessResponse();
     }

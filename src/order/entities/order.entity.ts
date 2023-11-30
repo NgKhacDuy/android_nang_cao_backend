@@ -31,4 +31,6 @@ export class Order {
   reasonCanceled: string;
   @Column({ default: '' })
   address: string;
+  @Column({ default: '' })
+  nvId: string;
 }

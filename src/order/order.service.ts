@@ -90,12 +90,18 @@ export class OrderService {
     }
   }
 
-  async updateStatus(id: number, status: StatusOrder, reason: string) {
+  async updateStatus(
+    id: number,
+    status: StatusOrder,
+    reason: string,
+    currentUser: User,
+  ) {
     try {
       const order = await this.orderRepository.findOneBy({ id: id });
       if (order != null) {
         order.status = status;
         order.reasonCanceled = reason;
+        order.nvId = currentUser.id.toString();
         this.orderRepository.save(order);
         return SuccessResponse();
       }
