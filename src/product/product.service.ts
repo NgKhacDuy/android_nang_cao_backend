@@ -80,7 +80,7 @@ export class ProductService {
         return BadRequestResponse('Page must be greater than zero');
       }
       const [product, total] = await this.productRepository.findAndCount({
-        take: 1,
+        take: 10,
         skip: page - 1 || 0,
       });
       if (product && product.length > 0) {
