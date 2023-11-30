@@ -18,6 +18,7 @@ import { UserRefreshDto } from './dto/user-refresh.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 import { MailService } from 'src/mail/mail.service';
+import { Role } from 'src/utilities/common/user-role.enum';
 
 @Injectable()
 export class UserService {
@@ -166,6 +167,18 @@ export class UserService {
       }
       await this.userRepository.softDelete({ id: id });
       return SuccessResponse('User deleted');
+    } catch (error) {
+      console.log(error);
+      return BadRequestResponse();
+    }
+  }
+
+  async getAllRoles() {
+    try {
+      if (Role == null) {
+        return NotFoundResponse('Role not found');
+      }
+      return SuccessResponse(Role);
     } catch (error) {
       console.log(error);
       return BadRequestResponse();

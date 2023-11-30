@@ -82,4 +82,9 @@ export class UserController {
   delete(@Param('id') id: number) {
     return this.userService.delete(id);
   }
+
+  @Get('role')
+  getRole() {
+    return this.userService.getAllRoles();
+  }
 }
