@@ -77,11 +77,10 @@ export class ProductController {
   @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
   update(
     @Param('id') id: string,
-    @Query('isChangeImg') isChangeImg: boolean,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() file,
   ) {
-    return this.productService.update(+id, updateProductDto, file, isChangeImg);
+    return this.productService.update(+id, updateProductDto, file);
   }
 
   @Get('name/:name')

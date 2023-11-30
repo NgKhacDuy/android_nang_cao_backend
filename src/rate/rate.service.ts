@@ -19,8 +19,8 @@ export class RateService {
     private productRepository: Repository<Product>,
     @InjectRepository(Rate)
     private rateRepository: Repository<Rate>, // @InjectRepository(User)
-    // private userRepository: Repository<User>,
-  ) {}
+  ) // private userRepository: Repository<User>,
+  {}
   async create(currentUser: User, createRateDto: CreateRateDto) {
     try {
       const product = await this.productRepository.findOneBy({

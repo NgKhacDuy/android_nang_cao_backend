@@ -123,12 +123,7 @@ export class ProductService {
     return SuccessResponse(product);
   }
 
-  async update(
-    id: number,
-    updateProductDto: UpdateProductDto,
-    file: any,
-    isChangeImg: boolean,
-  ) {
+  async update(id: number, updateProductDto: UpdateProductDto, file: any) {
     const productExist = await this.productRepository.findOneBy({ id });
     const categoryExist = await this.categoryRepository.findOneBy({
       id: updateProductDto.categoryId,
@@ -136,7 +131,7 @@ export class ProductService {
     if (productExist !== null && categoryExist !== null) {
       const product = this.productRepository.create(updateProductDto);
       product.category = categoryExist;
-      if (isChangeImg === true) {
+      if (file != null) {
         var successResponse;
         let listUrl = [];
         var auth = Buffer.from(process.env.PRIVATE_KEY + ':' + '').toString(
