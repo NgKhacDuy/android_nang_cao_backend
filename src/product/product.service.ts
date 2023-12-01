@@ -89,7 +89,8 @@ export class ProductService {
       }
       return NotFoundResponse();
     } catch (error) {
-      return error.message;
+      console.log(error);
+      return BadRequestResponse();
     }
   }
 
