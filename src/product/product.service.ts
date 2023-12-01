@@ -82,7 +82,7 @@ export class ProductService {
       }
       const [product, total] = await this.productRepository.findAndCount({
         take: 10,
-        skip: page - 1 || 0,
+        skip: (page - 1) * 10,
       });
       if (product && product.length > 0) {
         return SuccessResponse({ product, count: total });
