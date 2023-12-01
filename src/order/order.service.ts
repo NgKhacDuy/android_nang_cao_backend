@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { User } from 'src/user/entities/user.entity';
@@ -16,6 +16,7 @@ import {
 } from 'src/constants/reponse.constants';
 import { StatusOrder } from 'src/utilities/common/status-order.enum';
 import { MailService } from 'src/mail/mail.service';
+import { ApiInternalServerErrorResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class OrderService {
@@ -113,36 +114,41 @@ export class OrderService {
   }
 
   async findAll(page: number) {
-    if (page <= 0) {
-      return BadRequestResponse('Page must be greater than zero');
-    }
-    const [order, total] = await this.orderRepository.findAndCount({
-      take: 10,
-      skip: page - 1 || 0,
-    });
-    if (order.length > 0 && order) {
-      await Promise.all(
-        order.map(async (element) => {
-          const orderDetail = await this.orderDetailRepository.find({
-            where: {
-              order: element,
-            } as FindOptionsWhere<Order>,
-          });
+    try {
+      if (page <= 0) {
+        return BadRequestResponse('Page must be greater than zero');
+      }
+      const [order, total] = await this.orderRepository.findAndCount({
+        take: 10,
+        skip: (page - 1) * 10,
+      });
+      if (order.length > 0 && order) {
+        await Promise.all(
+          order.map(async (element) => {
+            const orderDetail = await this.orderDetailRepository.find({
+              where: {
+                order: element,
+              } as FindOptionsWhere<Order>,
+            });
 
-          await Promise.all(
-            orderDetail.map(async (iterator) => {
-              const product = await this.productRepository.findBy({
-                id: iterator.productId,
-              });
-              iterator.product = product;
-            }),
-          );
-          element.orderDetail = orderDetail;
-        }),
-      );
-      return SuccessResponse({ order, count: total });
+            await Promise.all(
+              orderDetail.map(async (iterator) => {
+                const product = await this.productRepository.findBy({
+                  id: iterator.productId,
+                });
+                iterator.product = product;
+              }),
+            );
+            element.orderDetail = orderDetail;
+          }),
+        );
+        return SuccessResponse({ order, count: total });
+      }
+      return NotFoundResponse('Order not found');
+    } catch (error) {
+      console.error(error);
+      return ApiInternalServerErrorResponse();
     }
-    return NotFoundResponse('Order not found');
   }
 
   async findOne(id: number) {
