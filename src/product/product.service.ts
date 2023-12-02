@@ -85,7 +85,14 @@ export class ProductService {
         skip: (page - 1) * 10,
       });
       if (product && product.length > 0) {
-        return SuccessResponse({ product, count: total });
+        const currentPage = +page;
+        const totalPage = Math.ceil(total / 10);
+        return SuccessResponse({
+          product,
+          count: total,
+          currentPage,
+          totalPage,
+        });
       }
       return NotFoundResponse();
     } catch (error) {

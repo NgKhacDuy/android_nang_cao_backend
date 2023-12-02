@@ -142,7 +142,9 @@ export class OrderService {
             element.orderDetail = orderDetail;
           }),
         );
-        return SuccessResponse({ order, count: total });
+        const currentPage = +page;
+        const totalPage = Math.ceil(total / 10);
+        return SuccessResponse({ order, count: total, currentPage, totalPage });
       }
       return NotFoundResponse('Order not found');
     } catch (error) {
