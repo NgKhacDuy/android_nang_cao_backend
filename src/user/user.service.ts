@@ -30,12 +30,13 @@ export class UserService {
   async signup(body: UserSignUpDto) {
     try {
       const userExists = await this.findUserByEmail(body.email);
-      if (userExists) return BadRequestResponse();
+      if (userExists) return BadRequestResponse('Email already exists');
       body.password = await hash(body.password, 10);
       const user = this.userRepository.create(body);
       await this.userRepository.save(user);
       return SuccessResponse();
     } catch (error) {
+      console.log(error);
       throw BadRequestResponse();
     }
   }
@@ -56,13 +57,21 @@ export class UserService {
     );
   }
 
-  async findAll() {
+  async findAll(page: number) {
     try {
-      const users = await this.userRepository.find({});
-      if (!users || users.length === 0) {
+      if (page <= 0) {
+        return BadRequestResponse('Page must be greater than zero');
+      }
+      const [users, total] = await this.userRepository.findAndCount({
+        take: 10,
+        skip: (page - 1) * 10 || 0,
+      });
+      if (!users && users.length <= 0) {
         return NotFoundResponse();
       }
-      return SuccessResponse(users);
+      const currentPage = +page || 1;
+      const totalPage = Math.ceil(total / 10);
+      return SuccessResponse({ users, count: total, currentPage, totalPage });
     } catch (error) {
       return error.message;
     }

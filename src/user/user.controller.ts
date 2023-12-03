@@ -39,9 +39,9 @@ export class UserController {
   }
 
   @UseGuards(AuthenGuard, AuthorizeGuard([Role.ADMIN]))
-  @Get('all')
-  async findAll() {
-    return this.userService.findAll();
+  @Get('all/:page')
+  async findAll(@Param('page') page: number) {
+    return this.userService.findAll(page);
   }
 
   @UseGuards(AuthenGuard, AuthorizeGuard([Role.ADMIN]))
