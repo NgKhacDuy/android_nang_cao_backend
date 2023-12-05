@@ -9,9 +9,13 @@ import { Repository } from 'typeorm';
 import { OrderDetail } from 'src/order_detail/entities/order_detail.entity';
 import { getManager } from 'typeorm';
 import dataSource from 'db/data-source';
-import { SuccessResponse } from 'src/constants/reponse.constants';
+import {
+  InternalServerErrorReponse,
+  SuccessResponse,
+} from 'src/constants/reponse.constants';
 import { Role } from 'src/utilities/common/user-role.enum';
 import { response } from 'express';
+import { ApiInternalServerErrorResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class StatisticsService {
@@ -88,8 +92,29 @@ export class StatisticsService {
     }
   }
 
-  getTop10Product() {
-    return `This action upd`;
+  async getTop10Product() {
+    try {
+      const result = await dataSource.query(
+        `select product.id, 
+                product.name, 
+                product.color, 
+                product.description, 
+                product.img, 
+                product.money, 
+                SUM(CAST("order_detail"."money" as INTEGER)) as SUM 
+            from "order_detail" 
+            inner join "product" 
+            on "order_detail"."productId" = product.id 
+            group by product.id 
+            order by SUM DESC
+            LIMIT 10
+            `,
+      );
+      return SuccessResponse(result);
+    } catch (error) {
+      console.log(error);
+      return InternalServerErrorReponse();
+    }
   }
 
   remove(id: number) {

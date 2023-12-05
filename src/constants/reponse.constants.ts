@@ -30,3 +30,8 @@ export const UnauthorizedResponse = () => ({
   message: '',
   statusCode: HttpStatus.UNAUTHORIZED,
 });
+
+export const InternalServerErrorReponse = () => ({
+  message: 'Internal Server Error',
+  statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+});

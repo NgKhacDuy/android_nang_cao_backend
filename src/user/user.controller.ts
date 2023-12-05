@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,7 +21,7 @@ import { AuthorizeGuard } from 'src/utilities/guards/authorization.guard';
 import { AuthorizeRoles } from 'src/utilities/decorators/authorize-roles.decorator';
 import { Role } from 'src/utilities/common/user-role.enum';
 import { UserRefreshDto } from './dto/user-refresh.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 
 @ApiTags('user')
@@ -86,5 +87,14 @@ export class UserController {
   @Get('role')
   getRole() {
     return this.userService.getAllRoles();
+  }
+
+  @Post('/admin/employee')
+  @ApiQuery({ name: 'role', enum: Role })
+  createEmployee(
+    @Query('role') role: Role = Role.NVBANHANG,
+    @Body() body: UserSignUpDto,
+  ) {
+    return this.userService.createEmployee(body, role);
   }
 }

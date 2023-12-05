@@ -28,7 +28,7 @@ export class User {
   @Column({ default: '' })
   firstName: string;
   @Column({ type: 'enum', enum: Role, default: [Role.USER] })
-  roles: Role[];
+  roles: Role;
   @CreateDateColumn()
   createAt: Date;
   @CreateDateColumn()

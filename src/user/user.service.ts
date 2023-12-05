@@ -29,8 +29,12 @@ export class UserService {
 
   async signup(body: UserSignUpDto) {
     try {
-      const userExists = await this.findUserByEmail(body.email);
-      if (userExists) return BadRequestResponse('Email already exists');
+      const emailExists = await this.findUserByEmail(body.email);
+      const userExist = await this.userRepository.findOneBy({
+        username: body.username,
+      });
+      if (userExist) return BadRequestResponse('Sser already exists');
+      if (emailExists) return BadRequestResponse('Email already exists');
       body.password = await hash(body.password, 10);
       const user = this.userRepository.create(body);
       await this.userRepository.save(user);
@@ -127,7 +131,12 @@ export class UserService {
 
   async accessToken(user: User) {
     return sign(
-      { id: user.id, username: user.username, role: user.roles },
+      {
+        id: user.id,
+        username: user.username,
+        role: user.roles,
+        password: user.password,
+      },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME },
     );
@@ -135,7 +144,12 @@ export class UserService {
 
   async generateRefreshToken(user: User) {
     return sign(
-      { id: user.id, username: user.username },
+      {
+        id: user.id,
+        username: user.username,
+        role: user.roles,
+        password: user.password,
+      },
       process.env.REFRESH_TOKEN_SECRET_KEY,
       { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME },
     );
@@ -191,6 +205,26 @@ export class UserService {
     } catch (error) {
       console.log(error);
       return BadRequestResponse();
+    }
+  }
+
+  async createEmployee(body: UserSignUpDto, role: Role) {
+    try {
+      const emailExists = await this.findUserByEmail(body.email);
+      const userExist = await this.userRepository.findOneBy({
+        username: body.username,
+      });
+      if (userExist) return BadRequestResponse('Sser already exists');
+      if (emailExists) return BadRequestResponse('Email already exists');
+      if (role == Role.USER) return BadRequestResponse('Role user not allowed');
+      body.password = await hash(body.password, 10);
+      const user = this.userRepository.create(body);
+      user.roles = role;
+      await this.userRepository.save(user);
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      throw BadRequestResponse();
     }
   }
 }

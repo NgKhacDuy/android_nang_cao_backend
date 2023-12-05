@@ -1,3 +1,4 @@
+import { Product } from 'src/product/entities/product.entity';
 import { RecipientBill } from 'src/recipient-bill/entities/recipient-bill.entity';
 import {
   Column,
@@ -17,6 +18,8 @@ export class Supplier {
   address: string;
   @OneToMany(() => RecipientBill, (recipient) => recipient.supplier)
   recipientBill: RecipientBill[];
+  @OneToMany(() => Product, (product) => product.supplier)
+  product: Product[];
   @DeleteDateColumn()
   deletedAt?: Date;
 }

@@ -9,7 +9,7 @@ import {
 
 export class CreateProductDto {
   @IsNumberString()
-  categoryId: number;
+  categoryId: string;
   @IsString()
   name: string;
   @IsString()
@@ -25,4 +25,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
   slug: string;
+  @IsNotEmpty()
+  @IsNumberString()
+  supplierId: string;
 }
