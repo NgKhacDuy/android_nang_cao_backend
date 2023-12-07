@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import {
   BadRequestResponse,
+  InternalServerErrorReponse,
   NotFoundResponse,
   SigninResponse,
   SuccessResponse,
@@ -225,6 +226,21 @@ export class UserService {
     } catch (error) {
       console.log(error);
       throw BadRequestResponse();
+    }
+  }
+
+  async updateRoleAdmin(id: number, role: Role) {
+    try {
+      const userExist = await this.userRepository.findOneBy({ id: id });
+      if (userExist) {
+        userExist.roles = role;
+        await this.userRepository.update(id, userExist);
+        return SuccessResponse();
+      }
+      return NotFoundResponse('User not found');
+    } catch (error) {
+      console.log(error);
+      return InternalServerErrorReponse();
     }
   }
 }
