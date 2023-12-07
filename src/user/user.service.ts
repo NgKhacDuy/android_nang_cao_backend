@@ -229,11 +229,15 @@ export class UserService {
     }
   }
 
-  async updateRoleAdmin(id: number, role: Role) {
+  async updateRoleAdmin(id: number, role: Role, body: UpdateUserDto) {
     try {
       const userExist = await this.userRepository.findOneBy({ id: id });
       if (userExist) {
         userExist.roles = role;
+        (userExist.email = body.email), (userExist.firstName = body.firstName);
+        userExist.lastName = body.lastName;
+        userExist.phoneNumber = body.phoneNumber;
+        userExist.gender = body.gender;
         await this.userRepository.update(id, userExist);
         return SuccessResponse();
       }

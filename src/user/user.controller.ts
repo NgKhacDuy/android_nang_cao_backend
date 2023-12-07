@@ -103,7 +103,8 @@ export class UserController {
   patchRoleAdmin(
     @Param('id') id: number,
     @Query('role') role: Role = Role.NVBANHANG,
+    @Body() body: UpdateUserDto,
   ) {
-    return this.userService.updateRoleAdmin(id, role);
+    return this.userService.updateRoleAdmin(id, role, body);
   }
 }
