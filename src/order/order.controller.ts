@@ -57,4 +57,9 @@ export class OrderController {
   findOne(@Param('id') id: string) {
     return this.orderService.findOne(+id);
   }
+
+  @Get('status')
+  getStatus() {
+    return this.orderService.getStatusEnum();
+  }
 }

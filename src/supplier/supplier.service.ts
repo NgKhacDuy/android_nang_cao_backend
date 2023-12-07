@@ -26,14 +26,25 @@ export class SupplierService {
     }
   }
 
-  async findAll() {
+  async findAll(page: number) {
     try {
-      const supplier = await this.supplierRepository.find({});
-      if (!supplier || supplier.length === 0) {
+      if (page <= 0) {
+        return BadRequestResponse('Page must be greater than zero');
+      }
+      const [supplier, total] = await this.supplierRepository.findAndCount({});
+      if (!supplier || supplier.length <= 0) {
         return NotFoundResponse();
       }
-      return SuccessResponse(supplier);
+      const currentPage = +page || 1;
+      const totalPage = Math.ceil(total / 10);
+      return SuccessResponse({
+        supplier,
+        count: total,
+        currentPage,
+        totalPage,
+      });
     } catch (error) {
+      console.log(error);
       return BadRequestResponse();
     }
   }

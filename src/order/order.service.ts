@@ -174,4 +174,13 @@ export class OrderService {
     }
     return NotFoundResponse('Order not found');
   }
+
+  getStatusEnum() {
+    try {
+      if (StatusOrder == null) {
+        return NotFoundResponse('Status not found');
+      }
+      return SuccessResponse(StatusOrder);
+    } catch (error) {}
+  }
 }

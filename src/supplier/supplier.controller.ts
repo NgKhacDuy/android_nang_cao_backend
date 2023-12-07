@@ -22,9 +22,9 @@ export class SupplierController {
     return this.supplierService.create(createSupplierDto);
   }
 
-  @Get()
-  findAll() {
-    return this.supplierService.findAll();
+  @Get('all/:page')
+  findAll(@Param('page') page: number) {
+    return this.supplierService.findAll(page);
   }
 
   @Get(':id')
