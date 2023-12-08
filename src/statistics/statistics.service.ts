@@ -16,6 +16,7 @@ import {
 import { Role } from 'src/utilities/common/user-role.enum';
 import { response } from 'express';
 import { ApiInternalServerErrorResponse } from '@nestjs/swagger';
+import * as moment from 'moment';
 
 @Injectable()
 export class StatisticsService {
@@ -117,7 +118,66 @@ export class StatisticsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} statistic`;
+  async getRevenueByMonth() {
+    try {
+      const months = Array.from({ length: 12 }, (_, i) => i + 1);
+
+      const revenueByMonth = await Promise.all(
+        months.map(async (month) => {
+          const revenue = await this.orderRepository
+            .createQueryBuilder('order')
+            .select('SUM(CAST(order.totalMoney as INTEGER))', 'revenue')
+            .where('EXTRACT(MONTH FROM order.dateCreate) = :month', { month })
+            .getRawOne();
+
+          return { month, revenue: revenue.revenue };
+        }),
+      );
+
+      return SuccessResponse(revenueByMonth);
+    } catch (error) {
+      console.log(error);
+      return InternalServerErrorReponse();
+    }
+  }
+
+  async getRevenueByWeek() {
+    try {
+      const startOfWeek = moment().isoWeekday(1).toDate();
+      const endOfWeek = moment().isoWeekday(7).toDate();
+
+      const days = [];
+      for (
+        let d = new Date(startOfWeek);
+        d <= endOfWeek;
+        d.setDate(d.getDate() + 1)
+      ) {
+        days.push(new Date(d));
+      }
+      const revenueByDay = await Promise.all(
+        days.map(async (day) => {
+          const revenue = await this.orderRepository
+            .createQueryBuilder('order')
+            .select('SUM(CAST(order.totalMoney as INTEGER))', 'revenue')
+            .where('EXTRACT(DAY FROM order.dateCreate) = :day', {
+              day: day.getDate(),
+            })
+            .andWhere('EXTRACT(MONTH FROM order.dateCreate) = :month', {
+              month: day.getMonth() + 1,
+            })
+            .andWhere('EXTRACT(YEAR FROM order.dateCreate) = :year', {
+              year: day.getFullYear(),
+            })
+            .getRawOne();
+
+          return { day, revenue: revenue.revenue };
+        }),
+      );
+
+      return SuccessResponse(revenueByDay);
+    } catch (error) {
+      console.log(error);
+      return InternalServerErrorReponse();
+    }
   }
 }

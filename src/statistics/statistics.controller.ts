@@ -31,4 +31,14 @@ export class StatisticsController {
   findTop10Product() {
     return this.statisticsService.getTop10Product();
   }
+
+  @Get('/revenue-by-month')
+  findRevenueByMonth() {
+    return this.statisticsService.getRevenueByMonth();
+  }
+
+  @Get('/revenue-by-week')
+  findRevenueByWeek() {
+    return this.statisticsService.getRevenueByWeek();
+  }
 }
