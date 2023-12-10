@@ -8,9 +8,10 @@ import { Cart } from 'src/cart/entities/cart.entity';
 import { CartDetail } from 'src/cart_detail/entities/cart_detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Equal, FindOptionsWhere, Repository } from 'typeorm';
 import {
   BadRequestResponse,
+  InternalServerErrorReponse,
   NotFoundResponse,
   SuccessResponse,
 } from 'src/constants/reponse.constants';
@@ -182,5 +183,41 @@ export class OrderService {
       }
       return SuccessResponse(StatusOrder);
     } catch (error) {}
+  }
+
+  async getProfileOrder(currentUser: User) {
+    try {
+      const order = await this.orderRepository.find({
+        where: {
+          user: Equal(currentUser.id),
+        },
+      });
+      if (order && order.length > 0) {
+        await Promise.all(
+          order.map(async (item) => {
+            const orderDetail = await this.orderDetailRepository.find({
+              where: {
+                order: order,
+              } as FindOptionsWhere<Order>,
+            });
+            await Promise.all(
+              orderDetail.map(async (iterator) => {
+                const product = await this.productRepository.findBy({
+                  id: iterator.productId,
+                });
+                iterator.product = product;
+              }),
+            );
+            item.orderDetail = orderDetail;
+          }),
+        );
+
+        return SuccessResponse(order);
+      }
+      return NotFoundResponse('Order not found');
+    } catch (error) {
+      console.log(error);
+      return InternalServerErrorReponse();
+    }
   }
 }

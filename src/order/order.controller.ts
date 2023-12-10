@@ -62,4 +62,10 @@ export class OrderController {
   getStatus() {
     return this.orderService.getStatusEnum();
   }
+
+  @Get()
+  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
+  getProfileOrder(@CurrentUser() currentUser: User) {
+    return this.orderService.getProfileOrder(currentUser);
+  }
 }
