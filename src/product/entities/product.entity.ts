@@ -48,6 +48,6 @@ export class Product {
   slug: string;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => Supplier, (supplier) => supplier.product)
+  @ManyToOne(() => Supplier, (supplier) => supplier.product, { eager: true })
   supplier: Supplier;
 }
