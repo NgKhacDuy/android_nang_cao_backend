@@ -98,7 +98,7 @@ export class UserController {
     return this.userService.createEmployee(body, role);
   }
 
-  @Patch('admin/employee/role')
+  @Patch('admin/employee/role/:id')
   @ApiQuery({ name: 'role', enum: Role })
   patchRoleAdmin(
     @Param('id') id: number,
