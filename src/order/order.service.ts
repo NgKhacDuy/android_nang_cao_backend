@@ -120,29 +120,30 @@ export class OrderService {
         return BadRequestResponse('Page must be greater than zero');
       }
       const [order, total] = await this.orderRepository.findAndCount({
+        loadEagerRelations: false,
         take: 10,
         skip: (page - 1) * 10,
       });
       if (order.length > 0 && order) {
-        await Promise.all(
-          order.map(async (element) => {
-            const orderDetail = await this.orderDetailRepository.find({
-              where: {
-                order: element,
-              } as FindOptionsWhere<Order>,
-            });
+        // await Promise.all(
+        //   order.map(async (element) => {
+        //     const orderDetail = await this.orderDetailRepository.find({
+        //       where: {
+        //         order: element,
+        //       } as FindOptionsWhere<Order>,
+        //     });
 
-            await Promise.all(
-              orderDetail.map(async (iterator) => {
-                const product = await this.productRepository.findBy({
-                  id: iterator.productId,
-                });
-                iterator.product = product;
-              }),
-            );
-            element.orderDetail = orderDetail;
-          }),
-        );
+        //     await Promise.all(
+        //       orderDetail.map(async (iterator) => {
+        //         const product = await this.productRepository.findBy({
+        //           id: iterator.productId,
+        //         });
+        //         iterator.product = product;
+        //       }),
+        //     );
+        //     element.orderDetail = orderDetail;
+        //   }),
+        // );
         const currentPage = +page;
         const totalPage = Math.ceil(total / 10);
         return SuccessResponse({ order, count: total, currentPage, totalPage });

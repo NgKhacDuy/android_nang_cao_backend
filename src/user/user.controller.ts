@@ -107,4 +107,12 @@ export class UserController {
   ) {
     return this.userService.updateRoleAdmin(id, role, body);
   }
+
+  @Post('resetPassword')
+  resetPasswordToken(
+    @CurrentUser() currentUser: User,
+    @Body() password: UserChangePassDto,
+  ) {
+    return this.userService.resetPasswordViaToken(currentUser, password);
+  }
 }

@@ -20,10 +20,10 @@ export class MailService {
   async sendPasswordReset(user: User, email: string) {
     const token = sign(
       { id: user.id, username: user.username },
-      process.env.RESET_PASSWORD_SECRET_KEY,
-      { expiresIn: process.env.RESET_PASSWORD_EXPIRE_TIME },
+      process.env.ACCESS_TOKEN_SECRET_KEY,
+      { expiresIn: '10m' },
     );
-    const url = `127.0.0.1:3000/auth/resetPassword?token=${token}`;
+    const url = `127.0.0.1:3000/forgot_password?token=${token}`;
     await this.mailerService.sendMail({
       to: email,
       subject: 'Reset password.',

@@ -246,6 +246,23 @@ export class UserService {
       return InternalServerErrorReponse();
     }
   }
+
+  async resetPasswordViaToken(currentUser: User, password: UserChangePassDto) {
+    try {
+      const userExist = await this.userRepository.findOneBy({
+        id: currentUser.id,
+      });
+      if (!userExist) {
+        return NotFoundResponse('user not found');
+      }
+      userExist.password = await hash(password.password, 10);
+      await this.userRepository.update(userExist.id, userExist);
+      return SuccessResponse();
+    } catch (error) {
+      console.log(error);
+      return InternalServerErrorReponse();
+    }
+  }
 }
 interface JwtPayload {
   id: string;
