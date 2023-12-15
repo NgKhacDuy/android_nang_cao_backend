@@ -63,7 +63,7 @@ export class UserController {
     return this.userService.changePassword(id, password);
   }
 
-  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER, Role.ADMIN]))
+  @UseGuards(AuthenGuard)
   @Get('profile')
   getProfile(@CurrentUser() currentUser: User) {
     return currentUser;
