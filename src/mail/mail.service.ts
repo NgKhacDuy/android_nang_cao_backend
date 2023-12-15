@@ -23,7 +23,7 @@ export class MailService {
       process.env.ACCESS_TOKEN_SECRET_KEY,
       { expiresIn: '10m' },
     );
-    const url = `127.0.0.1:3000/forgot_password?token=${token}`;
+    const url = `http://127.0.0.1:3000/forgot_password?token=${token}`;
     await this.mailerService.sendMail({
       to: email,
       subject: 'Reset password.',
