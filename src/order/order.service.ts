@@ -197,7 +197,7 @@ export class OrderService {
           order.map(async (item) => {
             const orderDetail = await this.orderDetailRepository.find({
               where: {
-                order: order,
+                order: item,
               } as FindOptionsWhere<Order>,
             });
             await Promise.all(
