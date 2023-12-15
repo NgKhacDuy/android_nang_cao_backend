@@ -215,9 +215,8 @@ export class UserService {
       const userExist = await this.userRepository.findOneBy({
         username: body.username,
       });
-      if (userExist) return BadRequestResponse('Sser already exists');
+      if (userExist) return BadRequestResponse('User already exists');
       if (emailExists) return BadRequestResponse('Email already exists');
-      if (role == Role.USER) return BadRequestResponse('Role user not allowed');
       body.password = await hash(body.password, 10);
       const user = this.userRepository.create(body);
       user.roles = role;
