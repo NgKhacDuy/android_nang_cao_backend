@@ -8,7 +8,7 @@ import { Cart } from 'src/cart/entities/cart.entity';
 import { CartDetail } from 'src/cart_detail/entities/cart_detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
-import { Equal, FindOptionsWhere, Repository } from 'typeorm';
+import { Equal, FindOptionsWhere, Not, Repository } from 'typeorm';
 import {
   BadRequestResponse,
   InternalServerErrorReponse,
@@ -121,6 +121,15 @@ export class OrderService {
       }
       const [order, total] = await this.orderRepository.findAndCount({
         loadEagerRelations: false,
+        select: [
+          'id',
+          'dateCreate',
+          'totalMoney',
+          'status',
+          'user',
+          'address',
+          'nvId',
+        ],
         take: 10,
         skip: (page - 1) * 10,
       });
