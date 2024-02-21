@@ -25,13 +25,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 import { Role } from 'src/utilities/common/user-role.enum';
 import { Response } from 'express';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  PhoneAuthProvider,
-} from 'firebase/auth';
-import * as admin from 'firebase-admin';
-import { RecaptchaVerifier } from 'firebase/auth';
+import { UserSearchDto } from './dto/user-search.dto';
 
 @Injectable()
 export class UserService {
@@ -58,9 +52,6 @@ export class UserService {
   }
 
   async signin(body: UserSignInDto, res: Response) {
-    const auth = admin.auth();
-    const provider = new PhoneAuthProvider(getAuth());
-    console.log(await auth.listUsers());
     const userExists = await this.userRepository
       .createQueryBuilder('users')
       .addSelect('users.password')
@@ -152,33 +143,15 @@ export class UserService {
     return SuccessResponse(user);
   }
 
-  // async resetPassword(resetPassword: UserResetPasswordDto) {
-  //   const userExist = await this.userRepository.findOneBy({
-  //     email: resetPassword.email,
-  //   });
-  //   if (!userExist) {
-  //     return NotFoundResponse('Email not exist');
-  //   }
-  //   await this.mailService.sendPasswordReset(userExist, resetPassword.email);
-  //   return SuccessResponse();
-  // }
-
-  // async resetPasswordViaToken(currentUser: User, password: UserChangePassDto) {
-  //   try {
-  //     const userExist = await this.userRepository.findOneBy({
-  //       id: currentUser.id,
-  //     });
-  //     if (!userExist) {
-  //       return NotFoundResponse('user not found');
-  //     }
-  //     userExist.password = await hash(password.password, 10);
-  //     await this.userRepository.update(userExist.id, userExist);
-  //     return SuccessResponse();
-  //   } catch (error) {
-  //     console.log(error);
-  //     return InternalServerErrorReponse();
-  //   }
-  // }
+  async findUser(keyword: string, res: Response) {
+    const user = await this.userRepository.find({
+      where: [
+        { name: ILike(`%${keyword}%`) },
+        { phoneNumber: ILike(`%${keyword}%`) },
+      ],
+    });
+    return res.status(200).send(SuccessResponse(user));
+  }
 }
 interface JwtPayload {
   id: string;

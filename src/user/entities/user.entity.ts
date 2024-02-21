@@ -1,3 +1,4 @@
+import { Friend } from 'src/friend/entities/friend.entity';
 import {
   Column,
   CreateDateColumn,
@@ -23,4 +24,6 @@ export class User {
   updateAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
+  @OneToMany(() => Friend, (friend) => friend.user)
+  friends: Friend[];
 }

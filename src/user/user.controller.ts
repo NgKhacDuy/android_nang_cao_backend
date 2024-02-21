@@ -25,6 +25,7 @@ import { UserRefreshDto } from './dto/user-refresh.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 import { Response } from 'express';
+import { UserSearchDto } from './dto/user-search.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -53,7 +54,7 @@ export class UserController {
   //   return this.userService.findName(name);
   // }
 
-  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
+  @UseGuards(AuthenGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -63,7 +64,7 @@ export class UserController {
     return this.userService.updateUser(id, updateUserDto, res);
   }
 
-  @UseGuards(AuthenGuard, AuthorizeGuard([Role.USER]))
+  @UseGuards(AuthenGuard)
   @Patch('password/:id')
   changePassword(@Param('id') id: string, @Body() password: UserChangePassDto) {
     return this.userService.changePassword(id, password);
@@ -83,46 +84,8 @@ export class UserController {
     return await this.userService.refreshToken(refreshToken, res);
   }
 
-  // @Post('password/:email')
-  // resetPassword(@Body() resetPassword: UserResetPasswordDto) {
-  //   return this.userService.resetPassword(resetPassword);
-  // }
-
-  // @Delete(':id')
-  // delete(@Param('id') id: number) {
-  //   return this.userService.delete(id);
-  // }
-
-  // @Get('role')
-  // getRole() {
-  //   return this.userService.getAllRoles();
-  // }
-
-  // @Post('/admin/employee')
-  // @ApiQuery({ name: 'role', enum: Role })
-  // createEmployee(
-  //   @Query('role') role: Role = Role.NVBANHANG,
-  //   @Body() body: UserSignUpDto,
-  // ) {
-  //   return this.userService.createEmployee(body, role);
-  // }
-
-  // @Patch('admin/employee/role/:id')
-  // @ApiQuery({ name: 'role', enum: Role })
-  // patchRoleAdmin(
-  //   @Param('id') id: number,
-  //   @Query('role') role: Role = Role.NVBANHANG,
-  //   @Body() body: UpdateUserDto,
-  // ) {
-  //   return this.userService.updateRoleAdmin(id, role, body);
-  // }
-
-  // @Post('resetPassword')
-  // resetPasswordToken(
-  //   @CurrentUser() currentUser: User,
-  //   @Body() password: UserChangePassDto,
-  // ) {
-  //   return this.userService.resetPasswordViaToken(currentUser, password);
-  // }
+  @Get('search/:keyword')
+  async searchUser(@Param('keyword') keyword: string, @Res() res: Response) {
+    return await this.userService.findUser(keyword, res);
+  }
 }
-// eslint-disable-next-line prettier/prettier
