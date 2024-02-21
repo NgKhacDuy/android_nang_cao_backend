@@ -1,25 +1,19 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumberString,
+  IsString,
+} from 'class-validator';
 import { GENDER } from 'src/utilities/common/user-gender.enum';
 
 export class UserSignUpDto {
   @IsNotEmpty()
   @IsString()
-  username: string;
+  name: string;
   @IsNotEmpty()
   password: string;
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
-  @IsNotEmpty()
-  @IsString()
-  firstName: string;
-  @IsNotEmpty()
-  @IsString()
-  lastName: string;
-  @IsNotEmpty()
-  @IsString()
+  @IsNumberString()
   phoneNumber: string;
-  @IsNotEmpty()
-  @IsEnum(GENDER)
-  gender: GENDER;
 }

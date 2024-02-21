@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ILike, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,105 +23,78 @@ import { UserChangePassDto } from './dto/user-changePass.dto';
 import { UserRefreshDto } from './dto/user-refresh.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
-import { MailService } from 'src/mail/mail.service';
 import { Role } from 'src/utilities/common/user-role.enum';
+import { Response } from 'express';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  PhoneAuthProvider,
+} from 'firebase/auth';
+import * as admin from 'firebase-admin';
+import { RecaptchaVerifier } from 'firebase/auth';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    private mailService: MailService,
   ) {}
 
-  async signup(body: UserSignUpDto) {
+  async signup(body: UserSignUpDto, res: Response) {
     try {
-      const emailExists = await this.findUserByEmail(body.email);
+      console.log(body.phoneNumber);
       const userExist = await this.userRepository.findOneBy({
-        username: body.username,
+        phoneNumber: body.phoneNumber,
       });
-      if (userExist) return BadRequestResponse('Sser already exists');
-      if (emailExists) return BadRequestResponse('Email already exists');
+      if (userExist)
+        return res.status(400).send(BadRequestResponse('User already exists'));
       body.password = await hash(body.password, 10);
       const user = this.userRepository.create(body);
       await this.userRepository.save(user);
-      return SuccessResponse();
+      return res.status(200).send(SuccessResponse());
     } catch (error) {
       console.log(error);
-      throw BadRequestResponse();
+      throw new InternalServerErrorException();
     }
   }
 
-  async signin(body: UserSignInDto) {
+  async signin(body: UserSignInDto, res: Response) {
+    const auth = admin.auth();
+    const provider = new PhoneAuthProvider(getAuth());
+    console.log(await auth.listUsers());
     const userExists = await this.userRepository
       .createQueryBuilder('users')
       .addSelect('users.password')
-      .where('users.username=:username', { username: body.username })
+      .where('users.phoneNumber=:phoneNumber', {
+        phoneNumber: body.phoneNumber,
+      })
       .getOne();
-    if (!userExists) return NotFoundResponse('User not found');
+
+    if (!userExists)
+      return res.status(404).send(NotFoundResponse('User not found'));
+
     const matchPassword = await compare(body.password, userExists.password);
-    if (!matchPassword) return BadRequestResponse();
+    if (!matchPassword) return res.status(400).send(BadRequestResponse());
     delete userExists.password;
-    return SigninResponse(
-      await this.accessToken(userExists),
-      await this.generateRefreshToken(userExists),
-    );
+    return res
+      .status(200)
+      .send(
+        SigninResponse(
+          await this.accessToken(userExists),
+          await this.generateRefreshToken(userExists),
+        ),
+      );
   }
 
-  async findAll(page: number) {
-    try {
-      if (page <= 0) {
-        return BadRequestResponse('Page must be greater than zero');
-      }
-      const [users, total] = await this.userRepository.findAndCount({
-        take: 10,
-        skip: (page - 1) * 10 || 0,
-      });
-      if (!users && users.length <= 0) {
-        return NotFoundResponse();
-      }
-      const currentPage = +page || 1;
-      const totalPage = Math.ceil(total / 10);
-      return SuccessResponse({ users, count: total, currentPage, totalPage });
-    } catch (error) {
-      return error.message;
-    }
-  }
-
-  async findId(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    if (user === null) {
-      return NotFoundResponse();
-    }
-    return SuccessResponse(user);
-  }
-
-  async findName(name: string) {
-    const user = await this.userRepository.find({
-      where: [
-        {
-          lastName: ILike(`%${name}%`),
-        },
-        {
-          firstName: ILike(`%${name}%`),
-        },
-      ],
-    });
-    if (user === null || user.length === 0) {
-      return NotFoundResponse();
-    }
-    return SuccessResponse(user);
-  }
-
-  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto, res: Response) {
     const user = await this.userRepository.findOneBy({ id });
     if (user !== null) {
       await this.userRepository.update(id, updateUserDto);
-      return SuccessResponse();
+      return res.status(200).send(SuccessResponse());
     }
-    return NotFoundResponse();
+    return res.status(404).send(NotFoundResponse());
   }
 
-  async changePassword(id: number, password: UserChangePassDto) {
+  async changePassword(id: string, password: UserChangePassDto) {
     const user = await this.userRepository.findOneBy({ id });
     if (user !== null) {
       password.password = await hash(password.password, 10);
@@ -126,17 +104,12 @@ export class UserService {
     return NotFoundResponse();
   }
 
-  async findUserByEmail(email: string) {
-    return await this.userRepository.findOneBy({ email });
-  }
-
   async accessToken(user: User) {
     return sign(
       {
         id: user.id,
-        username: user.username,
-        role: user.roles,
-        password: user.password,
+        name: user.name,
+        phoneNumber: user.phoneNumber,
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME },
@@ -147,21 +120,20 @@ export class UserService {
     return sign(
       {
         id: user.id,
-        username: user.username,
-        role: user.roles,
-        password: user.password,
+        name: user.name,
+        phoneNumber: user.phoneNumber,
       },
       process.env.REFRESH_TOKEN_SECRET_KEY,
       { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME },
     );
   }
 
-  async refreshToken(refreshToken: UserRefreshDto) {
+  async refreshToken(refreshToken: UserRefreshDto, res: Response) {
     try {
       const { id } = <JwtPayload>(
         verify(refreshToken.refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY)
       );
-      const user = await this.findId(+id);
+      const user = await this.userRepository.findOneBy({ id: id });
       if (!user) {
         throw new UnauthorizedException();
       }
@@ -172,97 +144,41 @@ export class UserService {
     }
   }
 
-  async resetPassword(resetPassword: UserResetPasswordDto) {
-    const userExist = await this.userRepository.findOneBy({
-      email: resetPassword.email,
-    });
-    if (!userExist) {
-      return NotFoundResponse('Email not exist');
+  async findId(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user === null) {
+      return NotFoundResponse();
     }
-    await this.mailService.sendPasswordReset(userExist, resetPassword.email);
-    return SuccessResponse();
+    return SuccessResponse(user);
   }
 
-  async delete(id: number) {
-    try {
-      const user = await this.userRepository.findOneBy({ id: id });
-      if (!user) {
-        return NotFoundResponse('User not found');
-      }
-      await this.userRepository.softDelete({ id: id });
-      return SuccessResponse('User deleted');
-    } catch (error) {
-      console.log(error);
-      return BadRequestResponse();
-    }
-  }
+  // async resetPassword(resetPassword: UserResetPasswordDto) {
+  //   const userExist = await this.userRepository.findOneBy({
+  //     email: resetPassword.email,
+  //   });
+  //   if (!userExist) {
+  //     return NotFoundResponse('Email not exist');
+  //   }
+  //   await this.mailService.sendPasswordReset(userExist, resetPassword.email);
+  //   return SuccessResponse();
+  // }
 
-  async getAllRoles() {
-    try {
-      if (Role == null) {
-        return NotFoundResponse('Role not found');
-      }
-      return SuccessResponse(Role);
-    } catch (error) {
-      console.log(error);
-      return BadRequestResponse();
-    }
-  }
-
-  async createEmployee(body: UserSignUpDto, role: Role) {
-    try {
-      const emailExists = await this.findUserByEmail(body.email);
-      const userExist = await this.userRepository.findOneBy({
-        username: body.username,
-      });
-      if (userExist) return BadRequestResponse('User already exists');
-      if (emailExists) return BadRequestResponse('Email already exists');
-      body.password = await hash(body.password, 10);
-      const user = this.userRepository.create(body);
-      user.roles = role;
-      await this.userRepository.save(user);
-      return SuccessResponse();
-    } catch (error) {
-      console.log(error);
-      throw BadRequestResponse();
-    }
-  }
-
-  async updateRoleAdmin(id: number, role: Role, body: UpdateUserDto) {
-    try {
-      const userExist = await this.userRepository.findOneBy({ id: id });
-      if (userExist) {
-        userExist.roles = role;
-        (userExist.email = body.email), (userExist.firstName = body.firstName);
-        userExist.lastName = body.lastName;
-        userExist.phoneNumber = body.phoneNumber;
-        userExist.gender = body.gender;
-        await this.userRepository.update(id, userExist);
-        return SuccessResponse();
-      }
-      return NotFoundResponse('User not found');
-    } catch (error) {
-      console.log(error);
-      return InternalServerErrorReponse();
-    }
-  }
-
-  async resetPasswordViaToken(currentUser: User, password: UserChangePassDto) {
-    try {
-      const userExist = await this.userRepository.findOneBy({
-        id: currentUser.id,
-      });
-      if (!userExist) {
-        return NotFoundResponse('user not found');
-      }
-      userExist.password = await hash(password.password, 10);
-      await this.userRepository.update(userExist.id, userExist);
-      return SuccessResponse();
-    } catch (error) {
-      console.log(error);
-      return InternalServerErrorReponse();
-    }
-  }
+  // async resetPasswordViaToken(currentUser: User, password: UserChangePassDto) {
+  //   try {
+  //     const userExist = await this.userRepository.findOneBy({
+  //       id: currentUser.id,
+  //     });
+  //     if (!userExist) {
+  //       return NotFoundResponse('user not found');
+  //     }
+  //     userExist.password = await hash(password.password, 10);
+  //     await this.userRepository.update(userExist.id, userExist);
+  //     return SuccessResponse();
+  //   } catch (error) {
+  //     console.log(error);
+  //     return InternalServerErrorReponse();
+  //   }
+  // }
 }
 interface JwtPayload {
   id: string;
