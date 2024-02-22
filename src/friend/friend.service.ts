@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateFriendDto } from './dto/create-friend.dto';
 import { UpdateFriendDto } from './dto/update-friend.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,9 +7,13 @@ import { Repository } from 'typeorm';
 import { Friend } from './entities/friend.entity';
 import { Response } from 'express';
 import {
+  BadRequestResponse,
   NotFoundResponse,
   SuccessResponse,
 } from 'src/constants/reponse.constants';
+import { UUID } from 'crypto';
+import { FriendStatusDtoEnum } from 'src/utilities/common/friend-status_dto.enum';
+import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 
 @Injectable()
 export class FriendService {
@@ -73,12 +77,50 @@ export class FriendService {
     }
   }
 
-  findOne(id: number) {
+  findOne(id: UUID) {
     return `This action returns a #${id} friend`;
   }
 
-  update(id: number, updateFriendDto: UpdateFriendDto) {
-    return `This action updates a #${id} friend`;
+  async update(
+    id: string,
+    status: FriendStatusDtoEnum,
+    currentUser: User,
+    res: Response,
+  ) {
+    try {
+      if (id == currentUser.id) {
+        return res
+          .status(400)
+          .send(BadRequestResponse('You can not accept or deny your self'));
+      }
+      const friendInvitation = await this.friendRepository.findOne({
+        where: [
+          { idReceiver: id, idSender: currentUser.id },
+          { idReceiver: currentUser.id, idSender: id },
+        ],
+      });
+      if (!friendInvitation) {
+        return res
+          .status(404)
+          .send(NotFoundResponse('Friend Invitation not found'));
+      }
+      if (friendInvitation.idSender == currentUser.id) {
+        return res
+          .status(400)
+          .send(BadRequestResponse('Id sender must not be your self'));
+      }
+      if (status == FriendStatusDtoEnum.REJECT) {
+        await this.friendRepository.remove([friendInvitation]);
+        return res.status(200).send(SuccessResponse('Rejected Successfully'));
+      } else {
+        friendInvitation.status = FriendStatus.ACCEPTED;
+        await this.friendRepository.save(friendInvitation);
+        return res.status(200).send(SuccessResponse('Accepted Successfully'));
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
   }
 
   remove(id: number) {

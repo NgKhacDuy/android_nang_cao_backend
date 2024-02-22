@@ -24,6 +24,6 @@ export class User {
   updateAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @OneToMany(() => Friend, (friend) => friend.user)
+  @OneToMany(() => Friend, (friend) => friend.user, { eager: true })
   friends: Friend[];
 }
