@@ -1,4 +1,5 @@
 import { Friend } from 'src/friend/entities/friend.entity';
+import { Room } from 'src/room/entities/room.entity';
 import {
   Column,
   CreateDateColumn,
@@ -26,4 +27,6 @@ export class User {
   deletedAt?: Date;
   @OneToMany(() => Friend, (friend) => friend.user, { eager: true })
   friends: Friend[];
+  @Column('json', { array: true, default: [] })
+  listRoom: Object[];
 }
