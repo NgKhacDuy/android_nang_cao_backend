@@ -6,6 +6,8 @@ import { CurrentUserMiddleware } from './utilities/middlewares/current-user.midd
 import { FriendModule } from './friend/friend.module';
 import { RoomModule } from './room/room.module';
 import { StatusModule } from './status/status.module';
+import { MessageModule } from './message/message.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { StatusModule } from './status/status.module';
     FriendModule,
     RoomModule,
     StatusModule,
+    MessageModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],

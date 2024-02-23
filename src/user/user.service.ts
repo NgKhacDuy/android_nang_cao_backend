@@ -26,11 +26,13 @@ import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 import { Role } from 'src/utilities/common/user-role.enum';
 import { Response } from 'express';
 import { UserSearchDto } from './dto/user-search.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signup(body: UserSignUpDto, res: Response) {
@@ -152,7 +154,12 @@ export class UserService {
     });
     return res.status(200).send(SuccessResponse(user));
   }
+
+  verifyJwt(jwt: string): Promise<any> {
+    return this.jwtService.verifyAsync(jwt);
+  }
 }
 interface JwtPayload {
   id: string;
 }
+
