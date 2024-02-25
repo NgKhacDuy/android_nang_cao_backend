@@ -4,9 +4,7 @@ import { dataSourceOptions } from 'db/data-source';
 import { UserModule } from './user/user.module';
 import { CurrentUserMiddleware } from './utilities/middlewares/current-user.middlewares';
 import { FriendModule } from './friend/friend.module';
-import { RoomModule } from './room/room.module';
 import { StatusModule } from './status/status.module';
-import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
@@ -14,9 +12,7 @@ import { ChatModule } from './chat/chat.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
     FriendModule,
-    RoomModule,
     StatusModule,
-    MessageModule,
     ChatModule,
   ],
   controllers: [],

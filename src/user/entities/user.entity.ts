@@ -1,10 +1,11 @@
+import { Room } from 'src/chat/entities/room.entity';
 import { Friend } from 'src/friend/entities/friend.entity';
-import { Room } from 'src/room/entities/room.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -27,6 +28,6 @@ export class User {
   deletedAt?: Date;
   @OneToMany(() => Friend, (friend) => friend.user, { eager: true })
   friends: Friend[];
-  @Column('json', { array: true, default: [] })
-  listRoom: Object[];
+  @ManyToMany(() => Room, (room) => room.users)
+  rooms: Room[];
 }
