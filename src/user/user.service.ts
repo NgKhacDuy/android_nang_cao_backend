@@ -71,9 +71,11 @@ export class UserService {
     return res
       .status(200)
       .send(
-        SigninResponse(
-          await this.accessToken(userExists),
-          await this.generateRefreshToken(userExists),
+        SuccessResponse(
+          SigninResponse(
+            await this.accessToken(userExists),
+            await this.generateRefreshToken(userExists),
+          ),
         ),
       );
   }
