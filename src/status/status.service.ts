@@ -7,6 +7,6 @@ import { SuccessResponse } from 'src/constants/reponse.constants';
 @Injectable()
 export class StatusService {
   findAll(res: Response) {
-    return res.status(200).send(SuccessResponse('Server started'));
+    return res.status(200).send('OK');
   }
 }
