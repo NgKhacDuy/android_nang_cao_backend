@@ -6,6 +6,7 @@ import { CurrentUserMiddleware } from './utilities/middlewares/current-user.midd
 import { FriendModule } from './friend/friend.module';
 import { StatusModule } from './status/status.module';
 import { ChatModule } from './chat/chat.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ChatModule } from './chat/chat.module';
     FriendModule,
     StatusModule,
     ChatModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],
