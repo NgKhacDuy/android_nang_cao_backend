@@ -3,7 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
-  @Cron('0 10 * * * *	')
+  @Cron(CronExpression.EVERY_10_MINUTES)
   refreshServer() {
     console.log('refresh server');
   }
