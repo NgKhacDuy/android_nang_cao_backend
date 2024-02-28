@@ -7,6 +7,7 @@ import { FriendModule } from './friend/friend.module';
 import { StatusModule } from './status/status.module';
 import { ChatModule } from './chat/chat.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
   ],
   controllers: [],
-  providers: [],
+  providers: [AppService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
