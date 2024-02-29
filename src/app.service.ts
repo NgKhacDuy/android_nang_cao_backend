@@ -12,7 +12,6 @@ export class AppService {
     if (request.status !== 200) {
       console.log('Cron job failed');
     } else {
-      console.log('Cron job successfully');
     }
   }
 }

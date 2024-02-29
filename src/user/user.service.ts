@@ -63,10 +63,15 @@ export class UserService {
       .getOne();
 
     if (!userExists)
-      return res.status(404).send(NotFoundResponse('User not found'));
+      return res
+        .status(404)
+        .send(NotFoundResponse('Tài khoản không đúng hoặc không tồn tại'));
 
     const matchPassword = await compare(body.password, userExists.password);
-    if (!matchPassword) return res.status(400).send(BadRequestResponse());
+    if (!matchPassword)
+      return res
+        .status(400)
+        .send(BadRequestResponse('Tài khoản không đúng hoặc không tồn tại'));
     delete userExists.password;
     return res
       .status(200)
