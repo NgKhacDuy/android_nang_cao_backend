@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import {
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
@@ -9,7 +10,9 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Room } from 'src/chat/entities/room.entity';
 import { RoomService } from 'src/chat/service/room.service';
+import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { CurrentUser } from 'src/utilities/decorators/current-user.decorators';
 
 @WebSocketGateway({
   cors: {
@@ -57,5 +60,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('createRoom')
   async onCreateRoom(socket: Socket, room: Room) {
     return this.roomService.createRoom(room, socket.data.user);
+  }
+
+  @SubscribeMessage('message')
+  async handleMessage(@MessageBody() message: string, socket: Socket) {
+    this.server.emit('message', message);
   }
 }

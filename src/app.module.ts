@@ -8,6 +8,7 @@ import { StatusModule } from './status/status.module';
 import { ChatModule } from './chat/chat.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from './app.service';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AppService } from './app.service';
     StatusModule,
     ChatModule,
     ScheduleModule.forRoot(),
+    MessageModule,
   ],
   controllers: [],
   providers: [AppService],

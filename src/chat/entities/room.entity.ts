@@ -1,3 +1,4 @@
+import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -20,6 +22,9 @@ export class Room {
   @JoinTable()
   users: User[];
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @OneToMany(() => Message, (message) => message.room)
+  messages: Message[];
+
+  @Column()
+  isGroup: boolean;
 }
