@@ -134,12 +134,20 @@ export class UserService {
         verify(refreshToken.refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY)
       );
       const user = await this.userRepository.findOneBy({ id: id });
+      console.log(user);
       if (!user) {
         throw new UnauthorizedException();
       }
-      const accessToken = await this.accessToken(user['data']);
-      return { accessToken };
+      const accessToken = await this.accessToken(user);
+      return res
+        .status(200)
+        .send(
+          SuccessResponse(
+            SigninResponse(accessToken, refreshToken.refreshToken),
+          ),
+        );
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException();
     }
   }
