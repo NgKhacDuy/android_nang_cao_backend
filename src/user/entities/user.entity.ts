@@ -28,6 +28,4 @@ export class User {
   deletedAt?: Date;
   @OneToMany(() => Friend, (friend) => friend.user, { eager: true })
   friends: Friend[];
-  @ManyToMany(() => Room, (room) => room.users)
-  rooms: Room[];
 }

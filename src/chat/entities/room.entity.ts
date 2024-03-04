@@ -1,3 +1,4 @@
+import { UUID } from 'crypto';
 import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -18,9 +19,8 @@ export class Room {
   @Column()
   name: string;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  users: User[];
+  @Column('text', { array: true })
+  listUsers: UUID[];
 
   @OneToMany(() => Message, (message) => message.room)
   messages: Message[];

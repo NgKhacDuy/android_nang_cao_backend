@@ -39,15 +39,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user) {
         return this.disconnect(socket);
       } else {
+        console.log(user);
         socket.data.user = user;
-        const rooms = await this.roomService.getRoomForUser(user.id, {
-          page: 1,
-          limit: 10,
-        });
-        return this.server.to(socket.id).emit('rooms', rooms);
+        // const rooms = await this.roomService.getRoomForUser(user.id, {
+        //   page: 1,
+        //   limit: 10,
+        // });
+        // return this.server.to(socket.id).emit('rooms', rooms);
       }
     } catch (error) {
-      console.log(error);
+      if (error.message == 'jwt expired') {
+        this.server.to(socket.id).emit('unauthorized');
+      }
       return this.disconnect(socket);
     }
   }
@@ -59,11 +62,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('createRoom')
   async onCreateRoom(socket: Socket, room: Room) {
-    return this.roomService.createRoom(room, socket.data.user);
+    // return this.roomService.createRoom(room, socket.data.user);
   }
 
   @SubscribeMessage('message')
   async handleMessage(@MessageBody() message: string, socket: Socket) {
+    console.log(message);
     this.server.emit('message', message);
   }
 }

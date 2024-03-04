@@ -10,22 +10,4 @@ export class RoomService {
   constructor(
     @InjectRepository(Room) private readonly roomRepository: Repository<Room>,
   ) {}
-
-  async createRoom(room: Room, creator: User) {
-    const newRoom = await this.addCreatorToRoom(room, creator);
-    return this.roomRepository.save(newRoom);
-  }
-
-  async getRoomForUser(userId: string, options: IPaginationOptions) {
-    const query = this.roomRepository
-      .createQueryBuilder('room')
-      .leftJoin('room.users', 'user')
-      .where('user.id = :userId', { userId });
-    return paginate(query, options);
-  }
-
-  async addCreatorToRoom(room: Room, creator: User) {
-    room.users.push(creator);
-    return room;
-  }
 }

@@ -1,3 +1,4 @@
+import { UUID } from 'crypto';
 import { Room } from 'src/chat/entities/room.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -7,7 +8,7 @@ export class Message {
   id: string;
 
   @Column()
-  senderId: string;
+  senderId: UUID;
 
   @Column()
   content: string;
