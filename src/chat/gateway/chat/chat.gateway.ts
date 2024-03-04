@@ -48,9 +48,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // return this.server.to(socket.id).emit('rooms', rooms);
       }
     } catch (error) {
-      if (error.message == 'jwt expired') {
-        this.server.to(socket.id).emit('unauthorized');
-      }
+      console.log(error);
       return this.disconnect(socket);
     }
   }
