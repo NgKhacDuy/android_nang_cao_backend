@@ -1,6 +1,12 @@
 import { UUID } from 'crypto';
 import { Room } from 'src/chat/entities/room.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('messages')
 export class Message {
@@ -17,5 +23,8 @@ export class Message {
   room: Room;
 
   @Column('text', { array: true })
-  readBy: string[];
+  readBy: [];
+
+  @CreateDateColumn()
+  createAt: Date;
 }

@@ -10,6 +10,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Room } from 'src/chat/entities/room.entity';
 import { RoomService } from 'src/chat/service/room.service';
+import { CreateMessageDto } from 'src/message/dto/create-message.dto';
+import { MessageService } from 'src/message/message.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { CurrentUser } from 'src/utilities/decorators/current-user.decorators';
@@ -23,6 +25,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private userService: UserService,
     private roomService: RoomService,
+    private messageService: MessageService,
   ) {}
   @WebSocketServer() server: Server;
   handleDisconnect(socket: Socket) {
@@ -35,17 +38,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         socket.handshake.headers.authorization,
       );
       const userResponse = await this.userService.findId(decodeToken.id);
-      const user = userResponse['data'];
+      const user: User = userResponse['data'];
       if (!user) {
         return this.disconnect(socket);
       } else {
-        console.log(user);
         socket.data.user = user;
-        // const rooms = await this.roomService.getRoomForUser(user.id, {
-        //   page: 1,
-        //   limit: 10,
-        // });
-        // return this.server.to(socket.id).emit('rooms', rooms);
+        const rooms = await this.roomService.getRoomForUser(user.id);
+        return this.server.to(socket.id).emit('rooms', rooms);
       }
     } catch (error) {
       console.log(error);
@@ -64,8 +63,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('message')
-  async handleMessage(@MessageBody() message: string, socket: Socket) {
-    console.log(message);
-    this.server.emit('message', message);
+  async handleMessage(
+    @MessageBody() message: CreateMessageDto,
+    socket: Socket,
+  ) {
+    this.server.emit('message', this.messageService.create(message));
   }
 }
