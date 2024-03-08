@@ -10,13 +10,14 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class Room {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ default: uuidv4() })
   name: string;
 
   @Column('text', { array: true })
