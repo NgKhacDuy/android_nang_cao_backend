@@ -44,6 +44,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       } else {
         socket.data.user = user;
         const rooms = await this.roomService.getRoomForUser(user.id);
+        console.log(rooms);
         return this.server.to(socket.id).emit('rooms', rooms);
       }
     } catch (error) {
