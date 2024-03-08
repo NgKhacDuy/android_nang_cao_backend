@@ -25,6 +25,6 @@ export class Room {
   @OneToMany(() => Message, (message) => message.room, { eager: true })
   messages: Message[];
 
-  @Column()
+  @Column({ default: false })
   isGroup: boolean;
 }
