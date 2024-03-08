@@ -22,7 +22,7 @@ export class Room {
   @Column('text', { array: true })
   listUsers: UUID[];
 
-  @OneToMany(() => Message, (message) => message.room)
+  @OneToMany(() => Message, (message) => message.room, { eager: true })
   messages: Message[];
 
   @Column()
