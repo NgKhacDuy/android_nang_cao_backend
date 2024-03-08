@@ -29,7 +29,7 @@ export class MessageService {
         roomExist = new Room();
         roomExist.isGroup = false;
         roomExist.listUsers = [dto.senderId, dto.receiverId];
-        roomExist.name = '';
+        roomExist.name = ' ';
         await this.roomRepository.save(roomExist);
       }
       const message = new Message();
