@@ -12,6 +12,8 @@ export class RoomService {
     @InjectRepository(Room) private readonly roomRepository: Repository<Room>,
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getRoomForUser(userId: String) {
@@ -23,10 +25,24 @@ export class RoomService {
       });
 
       // Extract only the last message from each room efficiently using map
-      const roomsWithLastMessage = rooms.map((room) => {
+      const roomsWithLastMessagePromise = rooms.map(async (room) => {
         const lastMessage = room.messages.length > 0 ? room.messages[0] : null;
-        return { ...room, lastMessage }; // Spread room properties and add lastMessage
+        if (room.isGroup == false) {
+          const partnerId =
+            room.listUsers[0] === userId
+              ? room.listUsers[1]
+              : room.listUsers[0];
+          const partner = await this.userRepository.findOneBy({
+            id: partnerId,
+          });
+          return { ...room, lastMessage, partner };
+        } else {
+          return { ...room, lastMessage }; // Spread room properties and add lastMessage
+        }
       });
+      const roomsWithLastMessage = await Promise.all(
+        roomsWithLastMessagePromise,
+      );
 
       return roomsWithLastMessage;
     } catch (error) {

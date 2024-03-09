@@ -7,12 +7,13 @@ import { Room } from './entities/room.entity';
 import { MessageService } from 'src/message/message.service';
 import { MessageModule } from 'src/message/message.module';
 import { Message } from 'src/message/entities/message.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
     MessageModule,
     UserModule,
-    TypeOrmModule.forFeature([Room, Message]),
+    TypeOrmModule.forFeature([Room, Message, User]),
   ],
   providers: [ChatGateway, RoomService, MessageService],
 })
