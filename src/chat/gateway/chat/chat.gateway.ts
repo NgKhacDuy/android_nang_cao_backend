@@ -8,6 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GetMessageDto } from 'src/chat/dto/get-message.dto';
 import { Room } from 'src/chat/entities/room.entity';
 import { RoomService } from 'src/chat/service/room.service';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
@@ -57,16 +58,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.disconnect();
   }
 
-  @SubscribeMessage('createRoom')
-  async onCreateRoom(socket: Socket, room: Room) {
-    // return this.roomService.createRoom(room, socket.data.user);
-  }
-
-  @SubscribeMessage('message')
+  @SubscribeMessage('join_room')
   async handleMessage(
-    @MessageBody() message: CreateMessageDto,
+    // @MessageBody() message: CreateMessageDto,
     socket: Socket,
+    roomid: GetMessageDto,
   ) {
-    this.server.emit('message', this.messageService.create(message));
+    this.server.socketsJoin(roomid.roomId);
+    // this.server.emit('message', this.messageService.create(message));
+    console.log('user connected: ' + socket.id);
+    this.server.to(roomid.roomId).emit('user_joined', { user: socket.id });
+    this.server
+      .to(roomid.roomId)
+      .emit('message', await this.roomService.getMessageForRoom(roomid));
   }
 }

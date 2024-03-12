@@ -11,4 +11,7 @@ export class CreateMessageDto {
   @IsNotEmpty()
   @IsString()
   content: string;
+  @IsNotEmpty()
+  @IsString()
+  roomId: string;
 }

@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Room } from '../entities/room.entity';
-import { ArrayContains, Repository } from 'typeorm';
+import { ArrayContains, FindOptionsWhere, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { Message } from 'src/message/entities/message.entity';
+import { CreateMessageDto } from 'src/message/dto/create-message.dto';
+import { GetMessageDto } from '../dto/get-message.dto';
 
 @Injectable()
 export class RoomService {
@@ -45,6 +47,20 @@ export class RoomService {
       );
 
       return roomsWithLastMessage;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getMessageForRoom(dto: GetMessageDto) {
+    try {
+      const room = await this.roomRepository.findOneBy({
+        id: dto.roomId,
+      });
+      const message = await this.messageRepository.findBy({
+        room: room,
+      } as FindOptionsWhere<Room>);
+      return message;
     } catch (error) {
       console.log(error);
     }
