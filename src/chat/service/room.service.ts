@@ -52,10 +52,12 @@ export class RoomService {
     }
   }
 
-  async getMessageForRoom(dto: GetMessageDto) {
+  async getMessageForRoom(dto: string) {
     try {
-      const room = await this.roomRepository.findOneBy({
-        id: dto.roomId,
+      const room = await this.roomRepository.findOne({
+        where: {
+          id: dto,
+        },
       });
       const message = await this.messageRepository.findBy({
         room: room,

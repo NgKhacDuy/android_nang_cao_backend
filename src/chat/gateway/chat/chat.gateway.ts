@@ -62,14 +62,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(
     // @MessageBody() message: CreateMessageDto,
     socket: Socket,
-    roomid: GetMessageDto,
+    roomId: string,
   ) {
-    this.server.socketsJoin(roomid.roomId);
+    this.server.socketsJoin(roomId);
     // this.server.emit('message', this.messageService.create(message));
     console.log('user connected: ' + socket.id);
-    this.server.to(roomid.roomId).emit('user_joined', { user: socket.id });
+    this.server.to(roomId).emit('user_joined', { user: socket.id });
     this.server
-      .to(roomid.roomId)
-      .emit('message', await this.roomService.getMessageForRoom(roomid));
+      .to(roomId)
+      .emit('message', await this.roomService.getMessageForRoom(roomId));
   }
 }
