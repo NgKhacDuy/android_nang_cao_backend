@@ -26,6 +26,7 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 import { Response } from 'express';
 import { UserSearchDto } from './dto/user-search.dto';
+import { SuccessResponse } from 'src/constants/reponse.constants';
 
 @ApiTags('user')
 @Controller('user')
@@ -72,8 +73,8 @@ export class UserController {
 
   @UseGuards(AuthenGuard)
   @Get('profile')
-  getProfile(@CurrentUser() currentUser: User) {
-    return currentUser;
+  getProfile(@CurrentUser() currentUser: User, @Res() res: Response) {
+    return res.status(200).send(SuccessResponse(currentUser));
   }
 
   @Post('refresh')
