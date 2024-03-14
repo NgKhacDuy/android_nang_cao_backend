@@ -66,7 +66,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const temp = JSON.parse(message);
     const dto: CreateMessageDto = temp;
-    this.server.to(dto.roomId).emit('message', this.messageService.create(dto));
+    await this.messageService.create(dto);
+    this.server
+      .to(dto.roomId)
+      .emit('message', await this.roomService.getMessageForRoom(dto.roomId));
   }
 
   @SubscribeMessage('join_room')
