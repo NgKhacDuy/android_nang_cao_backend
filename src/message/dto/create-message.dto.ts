@@ -5,9 +5,6 @@ export class CreateMessageDto {
   @IsUUID()
   @IsNotEmpty()
   senderId: UUID;
-  @IsUUID()
-  @IsNotEmpty()
-  receiverId: UUID;
   @IsNotEmpty()
   @IsString()
   content: string;

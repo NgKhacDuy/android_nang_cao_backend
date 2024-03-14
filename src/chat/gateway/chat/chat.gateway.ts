@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -58,15 +59,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.disconnect();
   }
 
-  @SubscribeMessage('join_room')
+  @SubscribeMessage('message')
   async handleMessage(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: any,
+  ) {
+    const temp = JSON.parse(message);
+    const dto: CreateMessageDto = temp;
+    this.server.to(dto.roomId).emit('message', this.messageService.create(dto));
+  }
+
+  @SubscribeMessage('join_room')
+  async handleJoinRoom(
     // @MessageBody() message: CreateMessageDto,
     socket: Socket,
     roomId: string,
   ) {
     this.server.socketsJoin(roomId);
     // this.server.emit('message', this.messageService.create(message));
-    console.log('user connected: ' + socket.id);
     this.server.to(roomId).emit('user_joined', { user: socket.id });
     this.server
       .to(roomId)
