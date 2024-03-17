@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ILike, Like, Repository } from 'typeorm';
+import { ILike, Like, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
@@ -27,11 +27,14 @@ import { Role } from 'src/utilities/common/user-role.enum';
 import { Response } from 'express';
 import { UserSearchDto } from './dto/user-search.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Friend } from 'src/friend/entities/friend.entity';
+import { stat } from 'fs';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Friend) private friendRepository: Repository<Friend>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -160,13 +163,26 @@ export class UserService {
     return SuccessResponse(user);
   }
 
-  async findUser(keyword: string, res: Response) {
-    const user = await this.userRepository.find({
+  async findUser(keyword: string, res: Response, currentUser: User) {
+    var user = await this.userRepository.find({
       where: [
-        { name: ILike(`%${keyword}%`) },
-        { phoneNumber: ILike(`%${keyword}%`) },
+        { name: ILike(`%${keyword}%`), id: Not(currentUser.id) },
+        { phoneNumber: ILike(`%${keyword}%`), id: Not(currentUser.id) },
       ],
     });
+    await Promise.all(
+      user.map(async (item) => {
+        const friend = await this.friendRepository.find({
+          where: [
+            { idSender: currentUser.id, idReceiver: item.id },
+            { idSender: item.id, idReceiver: currentUser.id },
+          ],
+        });
+        if (friend) {
+          item.friends = friend;
+        }
+      }),
+    );
     return res.status(200).send(SuccessResponse(user));
   }
 

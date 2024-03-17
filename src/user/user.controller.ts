@@ -85,8 +85,13 @@ export class UserController {
     return await this.userService.refreshToken(refreshToken, res);
   }
 
+  @UseGuards(AuthenGuard)
   @Get('search/:keyword')
-  async searchUser(@Param('keyword') keyword: string, @Res() res: Response) {
-    return await this.userService.findUser(keyword, res);
+  async searchUser(
+    @CurrentUser() currentUser: User,
+    @Param('keyword') keyword: string,
+    @Res() res: Response,
+  ) {
+    return await this.userService.findUser(keyword, res, currentUser);
   }
 }
