@@ -172,6 +172,7 @@ export class UserService {
     });
     await Promise.all(
       user.map(async (item) => {
+        item.friends = [];
         const friend = await this.friendRepository.find({
           where: [
             { idSender: currentUser.id, idReceiver: item.id },
