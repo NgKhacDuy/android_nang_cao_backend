@@ -8,9 +8,14 @@ import { MessageService } from 'src/message/message.service';
 import { MessageModule } from 'src/message/message.module';
 import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
+import { OneSignalModule } from 'onesignal-api-client-nest';
 
 @Module({
   imports: [
+    OneSignalModule.forRoot({
+      appId: process.env.ONESIGNAL_APP_ID,
+      restApiKey: process.env.ONESIGNAL_REST_API_KEY,
+    }),
     MessageModule,
     UserModule,
     TypeOrmModule.forFeature([Room, Message, User]),

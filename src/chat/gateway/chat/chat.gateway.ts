@@ -69,7 +69,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.messageService.create(dto);
     this.server
       .to(dto.roomId)
-      .emit('message', await this.roomService.getMessageForRoom(dto.roomId));
+      .emit(
+        'message',
+        await this.roomService.sendMessage(dto.roomId, dto.senderId),
+      );
   }
 
   @SubscribeMessage('join_room')

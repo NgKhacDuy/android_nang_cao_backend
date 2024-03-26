@@ -7,6 +7,8 @@ import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { Message } from 'src/message/entities/message.entity';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
+import { OneSignalService } from 'onesignal-api-client-nest';
+import { NotificationBySegmentBuilder } from 'onesignal-api-client-core';
 
 @Injectable()
 export class RoomService {
@@ -16,6 +18,7 @@ export class RoomService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly oneSignalService: OneSignalService,
   ) {}
 
   async getRoomForUser(userId: String) {
@@ -52,6 +55,16 @@ export class RoomService {
     }
   }
 
+  async createNotification(message: string, listUser: string[]) {
+    const input = new NotificationBySegmentBuilder()
+      .setIncludedSegments(listUser)
+      .notification()
+      .setContents({ en: message })
+      .build();
+
+    await this.oneSignalService.createNotification(input);
+  }
+
   async getMessageForRoom(dto: string) {
     try {
       const room = await this.roomRepository.findOne({
@@ -59,6 +72,35 @@ export class RoomService {
           id: dto,
         },
       });
+      const message = await this.messageRepository.findBy({
+        room: room,
+      } as FindOptionsWhere<Room>);
+      return message;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async sendMessage(roomId: string, senderId: string) {
+    try {
+      const room = await this.roomRepository.findOne({
+        where: {
+          id: roomId,
+        },
+      });
+      const sender = await this.userRepository.findOneBy({ id: senderId });
+      const listUser = await this.roomRepository.findOneBy({ id: roomId });
+      var listUserId = [];
+      Promise.all(
+        listUser.listUsers.map(async (e) => {
+          const user = await this.userRepository.findOneBy({ id: e });
+          listUserId.push(user.appId);
+        }),
+      );
+      await this.createNotification(
+        `${sender.name} đã gửi tin nhắn đến bạn`,
+        listUserId,
+      );
       const message = await this.messageRepository.findBy({
         room: room,
       } as FindOptionsWhere<Room>);
