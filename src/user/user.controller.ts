@@ -44,8 +44,8 @@ export class UserController {
   }
 
   @UseGuards(AuthenGuard)
-  @Post('signout')
-  async signout(@CurrentUser() currentUser: User, @Res() res: Response) {
+  @Get('logout')
+  async logout(@CurrentUser() currentUser: User, @Res() res: Response) {
     return await this.userService.signout(currentUser, res);
   }
 

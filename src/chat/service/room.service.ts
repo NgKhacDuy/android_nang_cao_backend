@@ -57,7 +57,7 @@ export class RoomService {
 
   async createNotification(message: string, listUser: string[]) {
     const input = new NotificationBySegmentBuilder()
-      .setIncludedSegments(listUser)
+      .setIncludedSegments(listUser.join('').split(''))
       .notification()
       .setContents({ en: message })
       .build();
@@ -91,16 +91,20 @@ export class RoomService {
       const sender = await this.userRepository.findOneBy({ id: senderId });
       const listUser = await this.roomRepository.findOneBy({ id: roomId });
       var listUserId = [];
-      Promise.all(
-        listUser.listUsers.map(async (e) => {
-          const user = await this.userRepository.findOneBy({ id: e });
-          listUserId.push(user.appId);
-        }),
-      );
-      await this.createNotification(
-        `${sender.name} đã gửi tin nhắn đến bạn`,
-        listUserId,
-      );
+      for (const e of listUser.listUsers) {
+        const user = await this.userRepository.findOneBy({ id: e });
+        if (user.appId != '') {
+          if (user.id != senderId) {
+            listUserId.push(user.appId);
+          }
+        }
+      }
+      if (listUserId.length > 0) {
+        await this.createNotification(
+          `${sender.name} đã gửi tin nhắn đến bạn`,
+          listUserId,
+        );
+      }
       const message = await this.messageRepository.findBy({
         room: room,
       } as FindOptionsWhere<Room>);

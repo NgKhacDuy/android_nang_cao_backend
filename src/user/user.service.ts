@@ -40,7 +40,6 @@ export class UserService {
 
   async signup(body: UserSignUpDto, res: Response) {
     try {
-      console.log(body.phoneNumber);
       const userExist = await this.userRepository.findOneBy({
         phoneNumber: body.phoneNumber,
       });
@@ -150,7 +149,6 @@ export class UserService {
         verify(refreshToken.refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY)
       );
       const user = await this.userRepository.findOneBy({ id: id });
-      console.log(user);
       if (!user) {
         throw new UnauthorizedException();
       }

@@ -15,7 +15,6 @@ export class MessageService {
   ) {}
   async create(dto: CreateMessageDto) {
     try {
-      console.log(dto);
       let roomExist = await this.roomRepository.findOne({
         where: [
           {
