@@ -28,4 +28,6 @@ export class User {
   deletedAt?: Date;
   @OneToMany(() => Friend, (friend) => friend.user, { eager: true })
   friends: Friend[];
+  @Column({ default: '' })
+  appId: string;
 }

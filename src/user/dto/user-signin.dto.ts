@@ -6,4 +6,6 @@ export class UserSignInDto {
   phoneNumber: string;
   @IsNotEmpty()
   password: string;
+  @IsNotEmpty()
+  appId: string;
 }

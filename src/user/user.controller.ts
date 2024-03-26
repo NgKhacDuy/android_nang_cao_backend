@@ -43,6 +43,12 @@ export class UserController {
     return await this.userService.signin(body, res);
   }
 
+  @UseGuards(AuthenGuard)
+  @Post('signout')
+  async signout(@CurrentUser() currentUser: User, @Res() res: Response) {
+    return await this.userService.signout(currentUser, res);
+  }
+
   // @UseGuards(AuthenGuard, AuthorizeGuard([Role.ADMIN]))
   // @Get('all/:page')
   // async findAll(@Param('page') page: number) {

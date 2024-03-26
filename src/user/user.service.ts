@@ -75,6 +75,8 @@ export class UserService {
       return res
         .status(400)
         .send(BadRequestResponse('Tài khoản không đúng hoặc không tồn tại'));
+    userExists.appId = body.appId;
+    await this.userRepository.save(userExists);
     delete userExists.password;
     return res
       .status(200)
@@ -86,6 +88,18 @@ export class UserService {
           ),
         ),
       );
+  }
+
+  async signout(currentUser: User, res: Response) {
+    try {
+      await this.userRepository.update(currentUser.id, {
+        appId: '',
+      });
+      return res.status(200).send(SuccessResponse());
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto, res: Response) {
