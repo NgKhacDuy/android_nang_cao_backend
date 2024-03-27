@@ -57,13 +57,18 @@ export class RoomService {
   }
 
   async createNotification(message: string, listUser: string[]) {
-    const input = new NotificationBySegmentBuilder()
-      .setIncludedSegments(listUser)
-      .notification()
-      .setContents({ en: message })
-      .build();
-
-    await this.oneSignalService.createNotification(input);
+    try {
+      const input = new NotificationBySegmentBuilder()
+        .setIncludedSegments(listUser)
+        .notification()
+        .setContents({ en: message })
+        .build();
+      await this.oneSignalService.createNotification(input);
+      console.log('noti sent successfully');
+    } catch (error) {
+      console.log('noti sent failed');
+      console.log(error);
+    }
   }
 
   async getMessageForRoom(dto: string) {
@@ -101,6 +106,7 @@ export class RoomService {
         }
       }
       if (listUserId.length > 0) {
+        console.log('ready for notification');
         await this.createNotification(
           `${sender.name} đã gửi tin nhắn đến bạn`,
           listUserId,
