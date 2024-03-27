@@ -9,6 +9,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { CreateRoomDto } from 'src/chat/dto/create-room.dto';
 import { GetMessageDto } from 'src/chat/dto/get-message.dto';
 import { Room } from 'src/chat/entities/room.entity';
 import { RoomService } from 'src/chat/service/room.service';
@@ -87,5 +88,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server
       .to(roomId)
       .emit('message', await this.roomService.getMessageForRoom(roomId));
+  }
+
+  @SubscribeMessage('create_room')
+  async handleCreateRoom(socket: Socket, @MessageBody() room: any) {
+    const convert = JSON.parse(room);
+    const dto: CreateRoomDto = convert;
+    await this.roomService.createRoom(dto);
+    this.handleConnection(socket);
   }
 }

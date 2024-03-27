@@ -9,6 +9,7 @@ import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
 import { OneSignalService } from 'onesignal-api-client-nest';
 import { NotificationBySegmentBuilder } from 'onesignal-api-client-core';
+import { CreateRoomDto } from '../dto/create-room.dto';
 
 @Injectable()
 export class RoomService {
@@ -57,7 +58,7 @@ export class RoomService {
 
   async createNotification(message: string, listUser: string[]) {
     const input = new NotificationBySegmentBuilder()
-      .setIncludedSegments(listUser.join('').split(''))
+      .setIncludedSegments(listUser)
       .notification()
       .setContents({ en: message })
       .build();
@@ -111,6 +112,19 @@ export class RoomService {
       return message;
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async createRoom(dto: CreateRoomDto) {
+    try {
+      const room = new Room();
+      room.name = dto.name;
+      room.isGroup = dto.listUser.length > 2;
+      room.listUsers = dto.listUser;
+      await this.roomRepository.save(room);
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
   }
 }

@@ -14,12 +14,15 @@ import {
 import { UUID } from 'crypto';
 import { FriendStatusDtoEnum } from 'src/utilities/common/friend-status_dto.enum';
 import { FriendStatus } from 'src/utilities/common/friend-status.enum';
+import { Room } from 'src/chat/entities/room.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class FriendService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Friend) private friendRepository: Repository<Friend>,
+    @InjectRepository(Room) private roomRepository: Repository<Room>,
   ) {}
   async create(
     createFriendDto: CreateFriendDto,
@@ -115,6 +118,12 @@ export class FriendService {
       } else {
         friendInvitation.status = FriendStatus.ACCEPTED;
         await this.friendRepository.save(friendInvitation);
+        const room = new Room();
+        room.isGroup = false;
+        room.listUsers = [];
+        room.listUsers.push(friendInvitation.idReceiver as UUID);
+        room.listUsers.push(friendInvitation.idSender as UUID);
+        await this.roomRepository.save(room);
         return res.status(200).send(SuccessResponse('Accepted Successfully'));
       }
     } catch (error) {
