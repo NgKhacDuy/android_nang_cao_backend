@@ -92,9 +92,8 @@ export class UserService {
 
   async signout(currentUser: User, res: Response) {
     try {
-      await this.userRepository.update(currentUser.id, {
-        appId: '',
-      });
+      currentUser.appId = '';
+      await this.userRepository.save(currentUser);
       return res.status(200).send(SuccessResponse());
     } catch (error) {
       console.log(error);
