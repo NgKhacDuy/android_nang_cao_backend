@@ -12,10 +12,6 @@ import { OneSignalModule } from 'onesignal-api-client-nest';
 
 @Module({
   imports: [
-    OneSignalModule.forRoot({
-      appId: process.env.ONESIGNAL_APP_ID,
-      restApiKey: process.env.ONESIGNAL_REST_API_KEY,
-    }),
     MessageModule,
     UserModule,
     TypeOrmModule.forFeature([Room, Message, User]),

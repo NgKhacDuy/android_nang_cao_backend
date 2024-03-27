@@ -10,6 +10,7 @@ import { GetMessageDto } from '../dto/get-message.dto';
 import { OneSignalService } from 'onesignal-api-client-nest';
 import { NotificationBySegmentBuilder } from 'onesignal-api-client-core';
 import { CreateRoomDto } from '../dto/create-room.dto';
+import axios from 'axios';
 
 @Injectable()
 export class RoomService {
@@ -19,7 +20,6 @@ export class RoomService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly oneSignalService: OneSignalService,
   ) {}
 
   async getRoomForUser(userId: String) {
@@ -58,12 +58,35 @@ export class RoomService {
 
   async createNotification(message: string, listUser: string[]) {
     try {
-      const input = new NotificationBySegmentBuilder()
-        .setIncludedSegments(listUser)
-        .notification()
-        .setContents({ en: message })
-        .build();
-      await this.oneSignalService.createNotification(input);
+      let data = JSON.stringify({
+        app_id: process.env.ONESIGNAL_APP_ID,
+        include_subscription_ids: listUser,
+        contents: {
+          en: `${message}`,
+        },
+      });
+
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://onesignal.com/api/v1/notifications',
+        headers: {
+          Authorization: `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
+          accept: 'application/json',
+          'content-type': 'application/json',
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       console.log('noti sent successfully');
     } catch (error) {
       console.log('noti sent failed');
