@@ -9,6 +9,7 @@ import { ChatModule } from './chat/chat.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from './app.service';
 import { MessageModule } from './message/message.module';
+import { AgoraModule } from './agora/agora.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MessageModule } from './message/message.module';
     ChatModule,
     ScheduleModule.forRoot(),
     MessageModule,
+    AgoraModule,
   ],
   controllers: [],
   providers: [AppService],

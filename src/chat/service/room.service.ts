@@ -56,14 +56,15 @@ export class RoomService {
     }
   }
 
-  async createNotification(message: string, listUser: string[]) {
+  async createNotification(title: string, content: string, listUser: string[]) {
     try {
       let data = JSON.stringify({
         app_id: process.env.ONESIGNAL_APP_ID,
         include_subscription_ids: listUser,
         contents: {
-          en: `${message}`,
+          en: `${content}`,
         },
+        headings: { en: `${title}` },
       });
 
       let config = {
@@ -131,7 +132,8 @@ export class RoomService {
       if (listUserId.length > 0) {
         console.log('ready for notification');
         await this.createNotification(
-          `${sender.name} đã gửi tin nhắn đến bạn`,
+          sender.name,
+          'đã gửi tin nhắn đến bạn',
           listUserId,
         );
       }

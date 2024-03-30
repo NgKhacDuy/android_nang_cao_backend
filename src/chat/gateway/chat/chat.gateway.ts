@@ -95,6 +95,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const convert = JSON.parse(room);
     const dto: CreateRoomDto = convert;
     await this.roomService.createRoom(dto);
-    this.handleConnection(socket);
   }
 }
