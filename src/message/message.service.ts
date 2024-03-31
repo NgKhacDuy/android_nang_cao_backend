@@ -24,7 +24,7 @@ export class MessageService {
       });
       const message = new Message();
       message.senderId = dto.senderId;
-      message.content = dto.content;
+      message.content = dto.content.trim();
       message.readBy = [];
       message.room = roomExist;
       await this.messageRepository.save(message);
