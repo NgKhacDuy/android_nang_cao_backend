@@ -29,12 +29,14 @@ import { UserSearchDto } from './dto/user-search.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Friend } from 'src/friend/entities/friend.entity';
 import { stat } from 'fs';
+import { Room } from 'src/chat/entities/room.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Friend) private friendRepository: Repository<Friend>,
+    @InjectRepository(Room) private roomRepository: Repository<Room>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -181,6 +183,9 @@ export class UserService {
         { phoneNumber: ILike(`%${keyword}%`), id: Not(currentUser.id) },
       ],
     });
+    var room = await this.roomRepository.find({
+      where: [{ name: ILike(`%${keyword}%`), isGroup: true }],
+    });
     await Promise.all(
       user.map(async (item) => {
         item.friends = [];
@@ -195,7 +200,7 @@ export class UserService {
         }
       }),
     );
-    return res.status(200).send(SuccessResponse(user));
+    return res.status(200).send(SuccessResponse({ user: user, room: room }));
   }
 
   verifyJwt(jwt: string): Promise<any> {

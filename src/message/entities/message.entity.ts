@@ -1,10 +1,13 @@
 import { UUID } from 'crypto';
 import { Room } from 'src/chat/entities/room.entity';
+import { Image } from 'src/image/entities/image.entity';
+import { MessageType } from 'src/utilities/common/message-type_dto.enum';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -16,7 +19,7 @@ export class Message {
   @Column()
   senderId: UUID;
 
-  @Column()
+  @Column({ default: '' })
   content: string;
 
   @ManyToOne(() => Room, (room) => room.messages)
@@ -27,4 +30,10 @@ export class Message {
 
   @CreateDateColumn()
   createAt: Date;
+
+  @Column({ type: 'enum', enum: MessageType, default: MessageType.raw })
+  type: MessageType;
+
+  @OneToMany(() => Image, (image) => image.message)
+  images: Image[];
 }

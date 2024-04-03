@@ -5,6 +5,9 @@ import { ArrayContains, Repository } from 'typeorm';
 import { Room } from 'src/chat/entities/room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from './entities/message.entity';
+import { ImagekitService } from 'src/imagekit/imagekit.service';
+import { MessageType } from 'src/utilities/common/message-type_dto.enum';
+import { Image } from 'src/image/entities/image.entity';
 
 @Injectable()
 export class MessageService {
@@ -12,6 +15,9 @@ export class MessageService {
     @InjectRepository(Room) private readonly roomRepository: Repository<Room>,
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
+    @InjectRepository(Image)
+    private readonly imageRepository: Repository<Image>,
+    private imagekitService: ImagekitService,
   ) {}
   async create(dto: CreateMessageDto) {
     try {
@@ -23,8 +29,23 @@ export class MessageService {
         ],
       });
       const message = new Message();
+      const imageList = [];
       message.senderId = dto.senderId;
-      message.content = dto.content.trim();
+      switch (dto.type) {
+        case 'raw':
+          message.content = dto.content.trim();
+        case 'image':
+          const imageUrl = await this.imagekitService.upload(dto.image);
+          for (const image of imageUrl) {
+            const imageEntity = new Image();
+            imageEntity.url = image;
+            imageList.push(imageEntity);
+            await this.imageRepository.save(imageEntity);
+          }
+          message.images = imageList;
+          message.content = dto.content.trim();
+          message.type = MessageType.image;
+      }
       message.readBy = [];
       message.room = roomExist;
       await this.messageRepository.save(message);

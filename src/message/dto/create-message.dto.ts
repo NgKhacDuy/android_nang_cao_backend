@@ -5,9 +5,9 @@ export class CreateMessageDto {
   @IsUUID()
   @IsNotEmpty()
   senderId: UUID;
-  @IsNotEmpty()
-  @IsString()
   content: string;
+  type: string;
+  image: [];
   @IsNotEmpty()
   @IsString()
   roomId: string;

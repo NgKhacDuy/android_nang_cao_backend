@@ -13,6 +13,7 @@ import { ServiceAccount } from 'firebase-admin';
 import * as admin from 'firebase-admin';
 import { initializeApp } from 'firebase-admin/app';
 import firebase from 'firebase/compat/app';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,6 +21,8 @@ async function bootstrap() {
   const documentOptions: SwaggerDocumentOptions = {
     ignoreGlobalPrefix: false,
   };
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('Zola Api')

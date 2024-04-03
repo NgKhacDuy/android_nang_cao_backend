@@ -13,6 +13,7 @@ import { CreateRoomDto } from 'src/chat/dto/create-room.dto';
 import { GetMessageDto } from 'src/chat/dto/get-message.dto';
 import { Room } from 'src/chat/entities/room.entity';
 import { RoomService } from 'src/chat/service/room.service';
+import { ImagekitService } from 'src/imagekit/imagekit.service';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { MessageService } from 'src/message/message.service';
 import { User } from 'src/user/entities/user.entity';
@@ -29,6 +30,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private userService: UserService,
     private roomService: RoomService,
     private messageService: MessageService,
+    private imagekitService: ImagekitService,
   ) {}
   @WebSocketServer() server: Server;
   handleDisconnect(socket: Socket) {
@@ -95,5 +97,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const convert = JSON.parse(room);
     const dto: CreateRoomDto = convert;
     await this.roomService.createRoom(dto);
+  }
+
+  @SubscribeMessage('image')
+  async handleImage(socket: Socket, @MessageBody() message: any) {
+    this.imagekitService.upload(message);
   }
 }

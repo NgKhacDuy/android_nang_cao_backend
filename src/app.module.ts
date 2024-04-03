@@ -10,6 +10,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from './app.service';
 import { MessageModule } from './message/message.module';
 import { AgoraModule } from './agora/agora.module';
+import { ImagekitService } from './imagekit/imagekit.service';
+import { ImagekitModule } from './imagekit/imagekit.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -21,6 +24,8 @@ import { AgoraModule } from './agora/agora.module';
     ScheduleModule.forRoot(),
     MessageModule,
     AgoraModule,
+    ImagekitModule,
+    ImageModule,
   ],
   controllers: [],
   providers: [AppService],

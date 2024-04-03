@@ -81,14 +81,10 @@ export class RoomService {
 
       axios
         .request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-        })
+        .then((response) => {})
         .catch((error) => {
           console.log(error);
         });
-
-      console.log('noti sent successfully');
     } catch (error) {
       console.log('noti sent failed');
       console.log(error);

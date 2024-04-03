@@ -9,13 +9,15 @@ import { MessageModule } from 'src/message/message.module';
 import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import { OneSignalModule } from 'onesignal-api-client-nest';
+import { ImagekitService } from 'src/imagekit/imagekit.service';
+import { Image } from 'src/image/entities/image.entity';
 
 @Module({
   imports: [
     MessageModule,
     UserModule,
-    TypeOrmModule.forFeature([Room, Message, User]),
+    TypeOrmModule.forFeature([Room, Message, User, Image]),
   ],
-  providers: [ChatGateway, RoomService, MessageService],
+  providers: [ChatGateway, RoomService, MessageService, ImagekitService],
 })
 export class ChatModule {}
