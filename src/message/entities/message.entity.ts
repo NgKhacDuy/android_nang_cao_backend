@@ -35,7 +35,7 @@ export class Message {
   @Column({ type: 'enum', enum: MessageType, default: MessageType.raw })
   type: MessageType;
 
-  @OneToMany(() => Image, (image) => image.message)
+  @OneToMany(() => Image, (image) => image.message, { eager: true })
   images: Image[];
 
   @ManyToOne(() => User, (user) => user.messages, { eager: true })
