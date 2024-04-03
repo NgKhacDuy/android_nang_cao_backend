@@ -1,6 +1,7 @@
 import { UUID } from 'crypto';
 import { Room } from 'src/chat/entities/room.entity';
 import { Image } from 'src/image/entities/image.entity';
+import { User } from 'src/user/entities/user.entity';
 import { MessageType } from 'src/utilities/common/message-type_dto.enum';
 import {
   Column,
@@ -36,4 +37,7 @@ export class Message {
 
   @OneToMany(() => Image, (image) => image.message)
   images: Image[];
+
+  @ManyToOne(() => User, (user) => user.messages, { eager: true })
+  user: User;
 }

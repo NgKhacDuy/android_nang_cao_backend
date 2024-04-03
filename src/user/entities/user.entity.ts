@@ -1,5 +1,6 @@
 import { Room } from 'src/chat/entities/room.entity';
 import { Friend } from 'src/friend/entities/friend.entity';
+import { Message } from 'src/message/entities/message.entity';
 import {
   Column,
   CreateDateColumn,
@@ -30,4 +31,6 @@ export class User {
   friends: Friend[];
   @Column({ default: '' })
   appId: string;
+  @OneToMany(() => Message, (message) => message.user)
+  messages: Message[];
 }

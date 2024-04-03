@@ -8,6 +8,7 @@ import { Message } from './entities/message.entity';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
 import { MessageType } from 'src/utilities/common/message-type_dto.enum';
 import { Image } from 'src/image/entities/image.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class MessageService {
@@ -17,6 +18,7 @@ export class MessageService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private imagekitService: ImagekitService,
   ) {}
   async create(dto: CreateMessageDto) {
@@ -46,6 +48,8 @@ export class MessageService {
           message.content = dto.content.trim();
           message.type = MessageType.image;
       }
+      const user = await this.userRepository.findOneBy({ id: dto.senderId });
+      message.user = user;
       message.readBy = [];
       message.room = roomExist;
       await this.messageRepository.save(message);
