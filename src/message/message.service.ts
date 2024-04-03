@@ -36,6 +36,7 @@ export class MessageService {
       switch (dto.type) {
         case 'raw':
           message.content = dto.content.trim();
+          message.type = MessageType.raw;
         case 'image':
           const imageUrl = await this.imagekitService.upload(dto.image);
           for (const image of imageUrl) {
