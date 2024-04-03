@@ -37,6 +37,7 @@ export class MessageService {
         case 'raw':
           message.content = dto.content.trim();
           message.type = MessageType.raw;
+          break;
         case 'image':
           const imageUrl = await this.imagekitService.upload(dto.image);
           for (const image of imageUrl) {
@@ -48,6 +49,7 @@ export class MessageService {
           message.images = imageList;
           message.content = dto.content.trim();
           message.type = MessageType.image;
+          break;
       }
       const user = await this.userRepository.findOneBy({ id: dto.senderId });
       message.user = user;

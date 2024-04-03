@@ -103,6 +103,9 @@ export class RoomService {
         where: {
           room: room,
         } as FindOptionsWhere<Room>,
+        order: {
+          createAt: 'asc',
+        },
       });
       return message;
     } catch (error) {
@@ -136,9 +139,15 @@ export class RoomService {
           listUserId,
         );
       }
-      const message = await this.messageRepository.findBy({
-        room: room,
-      } as FindOptionsWhere<Room>);
+      const message = await this.messageRepository.find({
+        relations: { images: true },
+        where: {
+          room: room,
+        } as FindOptionsWhere<Room>,
+        order: {
+          createAt: 'asc',
+        },
+      });
       return message;
     } catch (error) {
       console.log(error);
