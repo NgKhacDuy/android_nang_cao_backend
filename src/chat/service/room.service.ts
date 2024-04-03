@@ -98,9 +98,12 @@ export class RoomService {
           id: dto,
         },
       });
-      const message = await this.messageRepository.findBy({
-        room: room,
-      } as FindOptionsWhere<Room>);
+      const message = await this.messageRepository.find({
+        relations: { images: true },
+        where: {
+          room: room,
+        } as FindOptionsWhere<Room>,
+      });
       return message;
     } catch (error) {
       console.log(error);
