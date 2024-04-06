@@ -28,6 +28,7 @@ export class RoomService {
         where: { listUsers: ArrayContains([userId]) },
         relations: ['messages'], // Eagerly load messages
         order: { messages: { createAt: 'DESC' } }, // Order messages by createAt (latest first)
+        cache: true,
       });
 
       // Extract only the last message from each room efficiently using map
@@ -97,6 +98,7 @@ export class RoomService {
         where: {
           id: dto,
         },
+        cache: true,
       });
       const message = await this.messageRepository.find({
         relations: { images: true },
@@ -106,6 +108,7 @@ export class RoomService {
         order: {
           createAt: 'asc',
         },
+        cache: true,
       });
       return message;
     } catch (error) {
