@@ -182,11 +182,9 @@ export class UserService {
         { name: ILike(`%${keyword}%`), id: Not(currentUser.id) },
         { phoneNumber: ILike(`%${keyword}%`), id: Not(currentUser.id) },
       ],
-      cache: true,
     });
     var room = await this.roomRepository.find({
       where: [{ name: ILike(`%${keyword}%`), isGroup: true }],
-      cache: true,
     });
     await Promise.all(
       user.map(async (item) => {
@@ -196,7 +194,6 @@ export class UserService {
             { idSender: currentUser.id, idReceiver: item.id },
             { idSender: item.id, idReceiver: currentUser.id },
           ],
-          cache: true,
         });
         if (friend) {
           item.friends = friend;
