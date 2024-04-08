@@ -114,7 +114,7 @@ export class FriendService {
       }
       if (status == FriendStatusDtoEnum.REJECT) {
         await this.friendRepository.remove([friendInvitation]);
-        return res.status(200).send(SuccessResponse('Rejected Successfully'));
+        return res.status(200).send(SuccessResponse());
       } else {
         friendInvitation.status = FriendStatus.ACCEPTED;
         await this.friendRepository.save(friendInvitation);
@@ -124,7 +124,7 @@ export class FriendService {
         room.listUsers.push(friendInvitation.idReceiver as UUID);
         room.listUsers.push(friendInvitation.idSender as UUID);
         await this.roomRepository.save(room);
-        return res.status(200).send(SuccessResponse('Accepted Successfully'));
+        return res.status(200).send(SuccessResponse());
       }
     } catch (error) {
       console.log(error);
