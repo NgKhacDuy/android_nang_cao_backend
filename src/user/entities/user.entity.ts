@@ -31,4 +31,6 @@ export class User {
   appId: string;
   @OneToMany(() => Message, (message) => message.user)
   messages: Message[];
+  @ManyToMany(() => Friend, (friend) => friend.user)
+  friends: Friend[];
 }

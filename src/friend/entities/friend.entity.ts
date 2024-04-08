@@ -18,7 +18,7 @@ export class Friend {
   idSender: string;
   @Column({ default: '' })
   idReceiver: string;
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.friends)
   @JoinTable()
   user: User[];
   @Column({
