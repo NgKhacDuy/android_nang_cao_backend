@@ -37,7 +37,7 @@ export class FriendService {
         return res.status(404).send(NotFoundResponse('User does not exist'));
       }
       const newFriend = new Friend();
-      newFriend.user = currentUser;
+      newFriend.user = [currentUser, userExist];
       newFriend.idSender = currentUser.id;
       newFriend.idReceiver = createFriendDto.userId;
       await this.friendRepository.save(newFriend);

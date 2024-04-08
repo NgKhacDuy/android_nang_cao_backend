@@ -3,6 +3,7 @@ import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -17,8 +18,9 @@ export class Friend {
   idSender: string;
   @Column({ default: '' })
   idReceiver: string;
-  @ManyToOne(() => User, (user) => user.friends)
-  user: User;
+  @ManyToMany(() => User)
+  @JoinTable()
+  user: User[];
   @Column({
     type: 'enum',
     enum: FriendStatus,

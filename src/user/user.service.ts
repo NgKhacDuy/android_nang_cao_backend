@@ -150,7 +150,9 @@ export class UserService {
       const { id } = <JwtPayload>(
         verify(refreshToken.refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY)
       );
-      const user = await this.userRepository.findOneBy({ id: id });
+      const user = await this.userRepository.findOne({
+        where: { id: id },
+      });
       if (!user) {
         throw new UnauthorizedException();
       }
