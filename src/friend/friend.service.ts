@@ -42,7 +42,7 @@ export class FriendService {
       await this.onesignalService.createNotification(
         currentUser.name,
         'Đã gửi lời mời kết bạn',
-        [createFriendDto.userId],
+        [userExist.appId],
         FriendStatus.WAITING_FOR_ACCEPT,
         currentUser.id,
       );
@@ -139,7 +139,7 @@ export class FriendService {
         await this.onesignalService.createNotification(
           currentUser.name,
           'Đã chấp nhận kết bạn',
-          [id],
+          [user.appId],
           FriendStatus.ACCEPTED,
           currentUser.id,
         );
