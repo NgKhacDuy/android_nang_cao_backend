@@ -24,7 +24,7 @@ export class RoomService {
     try {
       const rooms = await this.roomRepository.find({
         where: { listUsers: ArrayContains([userId]) },
-        relations: ['messages', 'users'], // Eagerly load messages
+        relations: ['messages', 'user'], // Eagerly load messages
         order: { messages: { createAt: 'DESC' } }, // Order messages by createAt (latest first)
       });
 
