@@ -21,6 +21,7 @@ export class ImagekitService {
   }
 
   async upload(listBase64: string[]): Promise<string[]> {
+    this.imagekit = this.createImageKit();
     const responses: string[] = [];
 
     for (const base64 of listBase64) {
