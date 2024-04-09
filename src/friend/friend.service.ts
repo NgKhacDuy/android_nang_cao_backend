@@ -17,6 +17,7 @@ import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 import { Room } from 'src/chat/entities/room.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
+import { OnesignalService } from 'src/onesignal/onesignal.service';
 
 @Injectable()
 export class FriendService {
@@ -24,7 +25,7 @@ export class FriendService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Friend) private friendRepository: Repository<Friend>,
     @InjectRepository(Room) private roomRepository: Repository<Room>,
-    private readonly imageService: ImagekitService,
+    private readonly onesignalService: OnesignalService,
   ) {}
   async create(
     createFriendDto: CreateFriendDto,
@@ -38,7 +39,7 @@ export class FriendService {
       if (!userExist) {
         return res.status(404).send(NotFoundResponse('User does not exist'));
       }
-      await this.imageService.createNotification(
+      await this.onesignalService.createNotification(
         currentUser.name,
         'Đã gửi lời mời kết bạn',
         [createFriendDto.userId],
@@ -131,7 +132,7 @@ export class FriendService {
         room.listUsers.push(friendInvitation.idReceiver as UUID);
         room.listUsers.push(friendInvitation.idSender as UUID);
         await this.roomRepository.save(room);
-        await this.imageService.createNotification(
+        await this.onesignalService.createNotification(
           currentUser.name,
           'Đã chấp nhận kết bạn',
           [id],

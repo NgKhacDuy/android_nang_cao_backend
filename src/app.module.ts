@@ -13,6 +13,7 @@ import { AgoraModule } from './agora/agora.module';
 import { ImagekitService } from './imagekit/imagekit.service';
 import { ImagekitModule } from './imagekit/imagekit.module';
 import { ImageModule } from './image/image.module';
+import { OnesignalService } from './onesignal/onesignal.service';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { ImageModule } from './image/image.module';
     ImageModule,
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [AppService, OnesignalService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

@@ -7,10 +7,11 @@ import { User } from 'src/user/entities/user.entity';
 import { Room } from 'src/chat/entities/room.entity';
 import { Image } from 'src/image/entities/image.entity';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
+import { OnesignalService } from 'src/onesignal/onesignal.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Friend, User, Room, Image])],
+  imports: [TypeOrmModule.forFeature([Friend, User, Room])],
   controllers: [FriendController],
-  providers: [FriendService, ImagekitService],
+  providers: [FriendService, OnesignalService],
 })
 export class FriendModule {}
