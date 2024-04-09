@@ -20,26 +20,19 @@ export class ImagekitService {
     return this.imagekit;
   }
 
-  async upload(listBase64: string[]): Promise<string[]> {
+  async upload(listBase64: string[]) {
     this.imagekit = this.createImageKit();
-    const responses: string[] = [];
-
-    for (const base64 of listBase64) {
+    const tasks = listBase64.map((base64) => {
       const fileName = `${uuidv4()}.jpg`;
-      const response = await this.imagekit.upload({
+      return this.imagekit.upload({
         file: Buffer.from(base64, 'base64'),
         fileName,
         extensions: [
-          {
-            name: 'google-auto-tagging',
-            maxTags: 5,
-            minConfidence: 95,
-          },
+          { name: 'google-auto-tagging', maxTags: 5, minConfidence: 95 },
         ],
       });
-      responses.push(response.url);
-    }
-
-    return responses;
+    });
+    const responses = await Promise.all(tasks);
+    return responses.map((response) => response.url);
   }
 }
