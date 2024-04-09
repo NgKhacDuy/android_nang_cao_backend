@@ -8,7 +8,6 @@ import { MessageService } from 'src/message/message.service';
 import { MessageModule } from 'src/message/message.module';
 import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
-import { OneSignalModule } from 'onesignal-api-client-nest';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
 import { Image } from 'src/image/entities/image.entity';
 

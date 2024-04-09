@@ -7,8 +7,6 @@ import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { Message } from 'src/message/entities/message.entity';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
-import { OneSignalService } from 'onesignal-api-client-nest';
-import { NotificationBySegmentBuilder } from 'onesignal-api-client-core';
 import { CreateRoomDto } from '../dto/create-room.dto';
 import axios from 'axios';
 
