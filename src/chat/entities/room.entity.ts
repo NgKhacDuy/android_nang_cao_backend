@@ -28,4 +28,8 @@ export class Room {
 
   @Column({ default: false })
   isGroup: boolean;
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  user: User[];
 }

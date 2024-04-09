@@ -100,4 +100,13 @@ export class UserController {
   ) {
     return await this.userService.findUser(keyword, res, currentUser);
   }
+
+  @UseGuards(AuthenGuard)
+  @Get('friendrequest')
+  async getFriendRequest(
+    @CurrentUser() currentUser: User,
+    @Res() res: Response,
+  ) {
+    return await this.userService.getFriendRequest(res, currentUser);
+  }
 }

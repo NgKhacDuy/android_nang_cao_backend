@@ -30,6 +30,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Friend } from 'src/friend/entities/friend.entity';
 import { stat } from 'fs';
 import { Room } from 'src/chat/entities/room.entity';
+import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 
 @Injectable()
 export class UserService {
@@ -207,6 +208,23 @@ export class UserService {
 
   verifyJwt(jwt: string): Promise<any> {
     return this.jwtService.verifyAsync(jwt);
+  }
+
+  async getFriendRequest(res: Response, currentUser: User) {
+    try {
+      const friend = await this.friendRepository.find({
+        where: [
+          {
+            idReceiver: currentUser.id,
+            status: FriendStatus.WAITING_FOR_ACCEPT,
+          },
+          { idSender: currentUser.id, status: FriendStatus.WAITING_FOR_ACCEPT },
+        ],
+      });
+      return res.status(200).send(SuccessResponse(friend));
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 interface JwtPayload {

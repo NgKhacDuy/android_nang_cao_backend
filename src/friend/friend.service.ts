@@ -131,6 +131,7 @@ export class FriendService {
         room.listUsers = [];
         room.listUsers.push(friendInvitation.idReceiver as UUID);
         room.listUsers.push(friendInvitation.idSender as UUID);
+        room.user = [friendInvitation.user[0], friendInvitation.user[1]];
         await this.roomRepository.save(room);
         await this.onesignalService.createNotification(
           currentUser.name,

@@ -24,7 +24,7 @@ export class RoomService {
     try {
       const rooms = await this.roomRepository.find({
         where: { listUsers: ArrayContains([userId]) },
-        relations: ['messages'], // Eagerly load messages
+        relations: ['messages', 'users'], // Eagerly load messages
         order: { messages: { createAt: 'DESC' } }, // Order messages by createAt (latest first)
       });
 
@@ -154,10 +154,16 @@ export class RoomService {
 
   async createRoom(dto: CreateRoomDto) {
     try {
+      var listUser = [];
+      dto.listUser.map((e) => {
+        const user = this.userRepository.findOneBy({ id: e });
+        listUser.push(user);
+      });
       const room = new Room();
       room.name = dto.name;
       room.isGroup = dto.listUser.length > 2;
       room.listUsers = dto.listUser;
+      room.user = listUser;
       await this.roomRepository.save(room);
     } catch (error) {
       console.log(error);
