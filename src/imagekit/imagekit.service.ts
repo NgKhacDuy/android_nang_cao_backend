@@ -20,11 +20,12 @@ export class ImagekitService {
     return this.imagekit;
   }
 
-  async upload(listBase64: string[]) {
-    this.imagekit = this.createImageKit();
-    const tasks = listBase64.map((base64) => {
+  async upload(listBase64: string[]): Promise<string[]> {
+    const responses: string[] = [];
+
+    for (const base64 of listBase64) {
       const fileName = `${uuidv4()}.jpg`;
-      return this.imagekit.upload({
+      const response = await this.imagekit.upload({
         file: Buffer.from(base64, 'base64'),
         fileName,
         extensions: [
@@ -35,8 +36,9 @@ export class ImagekitService {
           },
         ],
       });
-    });
-    const responses = await Promise.all(tasks);
-    return responses.map((response) => response.url);
+      responses.push(response.url);
+    }
+
+    return responses;
   }
 }
