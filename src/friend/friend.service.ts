@@ -43,6 +43,8 @@ export class FriendService {
         currentUser.name,
         'Đã gửi lời mời kết bạn',
         [createFriendDto.userId],
+        FriendStatus.WAITING_FOR_ACCEPT,
+        currentUser.id,
       );
       const newFriend = new Friend();
       newFriend.user = [currentUser, userExist];
@@ -131,12 +133,15 @@ export class FriendService {
         room.listUsers = [];
         room.listUsers.push(friendInvitation.idReceiver as UUID);
         room.listUsers.push(friendInvitation.idSender as UUID);
-        room.user = [friendInvitation.user[0], friendInvitation.user[1]];
+        const user = await this.userRepository.findOneBy({ id: id });
+        room.user = [currentUser, user];
         await this.roomRepository.save(room);
         await this.onesignalService.createNotification(
           currentUser.name,
           'Đã chấp nhận kết bạn',
           [id],
+          FriendStatus.ACCEPTED,
+          currentUser.id,
         );
         return res.status(200).send(SuccessResponse());
       }

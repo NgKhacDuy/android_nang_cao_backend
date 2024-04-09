@@ -9,6 +9,7 @@ import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
 import { CreateRoomDto } from '../dto/create-room.dto';
 import axios from 'axios';
+import { OnesignalService } from 'src/onesignal/onesignal.service';
 
 @Injectable()
 export class RoomService {
@@ -18,6 +19,7 @@ export class RoomService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly onesignalService: OnesignalService,
   ) {}
 
   async getRoomForUser(userId: String) {
@@ -50,41 +52,6 @@ export class RoomService {
 
       return roomsWithLastMessage;
     } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async createNotification(title: string, content: string, listUser: string[]) {
-    try {
-      let data = JSON.stringify({
-        app_id: process.env.ONESIGNAL_APP_ID,
-        include_subscription_ids: listUser,
-        contents: {
-          en: `${content}`,
-        },
-        headings: { en: `${title}` },
-      });
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'https://onesignal.com/api/v1/notifications',
-        headers: {
-          Authorization: `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
-          accept: 'application/json',
-          'content-type': 'application/json',
-        },
-        data: data,
-      };
-
-      axios
-        .request(config)
-        .then((response) => {})
-        .catch((error) => {
-          console.log(error);
-        });
-    } catch (error) {
-      console.log('noti sent failed');
       console.log(error);
     }
   }
@@ -131,10 +98,12 @@ export class RoomService {
       }
       if (listUserId.length > 0) {
         console.log('ready for notification');
-        await this.createNotification(
+        await this.onesignalService.createNotification(
           sender.name,
           'đã gửi tin nhắn đến bạn',
           listUserId,
+          'message',
+          roomId,
         );
       }
       const message = await this.messageRepository.find({

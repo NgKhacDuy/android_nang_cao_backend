@@ -10,6 +10,7 @@ import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
 import { Image } from 'src/image/entities/image.entity';
+import { OnesignalService } from 'src/onesignal/onesignal.service';
 
 @Module({
   imports: [
@@ -17,6 +18,12 @@ import { Image } from 'src/image/entities/image.entity';
     UserModule,
     TypeOrmModule.forFeature([Room, Message, User, Image]),
   ],
-  providers: [ChatGateway, RoomService, MessageService, ImagekitService],
+  providers: [
+    ChatGateway,
+    RoomService,
+    MessageService,
+    ImagekitService,
+    OnesignalService,
+  ],
 })
 export class ChatModule {}

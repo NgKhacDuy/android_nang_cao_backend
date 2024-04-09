@@ -3,13 +3,23 @@ import axios from 'axios';
 
 @Injectable()
 export class OnesignalService {
-  async createNotification(title: string, content: string, listUser: string[]) {
+  async createNotification(
+    title: string,
+    content: string,
+    listUser: string[],
+    type: string,
+    dataType: string,
+  ) {
     try {
       let data = JSON.stringify({
         app_id: process.env.ONESIGNAL_APP_ID,
         include_subscription_ids: listUser,
         contents: {
           en: `${content}`,
+        },
+        custom_data: {
+          type: `${type}`,
+          data: `${dataType}`,
         },
         headings: { en: `${title}` },
       });
@@ -28,7 +38,9 @@ export class OnesignalService {
 
       axios
         .request(config)
-        .then((response) => {})
+        .then((response) => {
+          console.log(response);
+        })
         .catch((error) => {
           console.log(error);
         });
