@@ -17,7 +17,7 @@ export class OnesignalService {
         contents: {
           en: `${content}`,
         },
-        custom_data: {
+        data: {
           type: `${type}`,
           data: `${dataType}`,
         },
