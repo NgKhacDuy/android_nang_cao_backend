@@ -220,6 +220,7 @@ export class UserService {
           },
           { idSender: currentUser.id, status: FriendStatus.WAITING_FOR_ACCEPT },
         ],
+        relations: { user: true },
       });
       return res.status(200).send(SuccessResponse(friend));
     } catch (error) {
