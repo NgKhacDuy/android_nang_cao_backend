@@ -124,10 +124,10 @@ export class RoomService {
   async createRoom(dto: CreateRoomDto) {
     try {
       var listUser = [];
-      dto.listUser.map((e) => {
-        const user = this.userRepository.findOneBy({ id: e });
+      for (const e of dto.listUser) {
+        const user = await this.userRepository.findOneBy({ id: e });
         listUser.push(user);
-      });
+      }
       const room = new Room();
       room.name = dto.name;
       room.isGroup = dto.listUser.length > 2;
