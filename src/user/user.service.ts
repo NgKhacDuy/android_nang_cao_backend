@@ -31,6 +31,7 @@ import { Friend } from 'src/friend/entities/friend.entity';
 import { stat } from 'fs';
 import { Room } from 'src/chat/entities/room.entity';
 import { FriendStatus } from 'src/utilities/common/friend-status.enum';
+import axios from 'axios';
 
 @Injectable()
 export class UserService {
@@ -223,6 +224,40 @@ export class UserService {
         relations: { user: true },
       });
       return res.status(200).send(SuccessResponse(friend));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async uploadImg(res: Response, currentUser: User, file: any) {
+    try {
+      var auth = Buffer.from(
+        process.env.PRIVATE_KEY_IMAGE_KIT + ':' + '',
+      ).toString('base64');
+      const headersRequest = {
+        'Content-Type': 'multipart/form-data;',
+        Authorization: `Basic ${auth}`,
+      };
+      for (let i in file) {
+        let data = new FormData();
+        data.append('file', file[i].buffer.toString('base64'));
+        data.append('fileName', file[i].originalname);
+        await axios
+          .request({
+            method: 'POST',
+            maxBodyLength: Infinity,
+            url: process.env.URL_UPLOAD,
+            headers: headersRequest,
+            data: data,
+          })
+          .then((response) => {
+            currentUser.avatar = response.data['url'];
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      return res.status(200).send(SuccessResponse());
     } catch (error) {
       console.error(error);
     }

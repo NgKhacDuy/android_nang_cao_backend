@@ -33,4 +33,6 @@ export class User {
   messages: Message[];
   @ManyToMany(() => Friend, (friend) => friend.user)
   friends: Friend[];
+  @Column({ default: '' })
+  avatar: string;
 }

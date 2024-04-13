@@ -9,6 +9,8 @@ import {
   UseGuards,
   Query,
   Res,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -22,11 +24,13 @@ import { AuthorizeGuard } from 'src/utilities/guards/authorization.guard';
 import { AuthorizeRoles } from 'src/utilities/decorators/authorize-roles.decorator';
 import { Role } from 'src/utilities/common/user-role.enum';
 import { UserRefreshDto } from './dto/user-refresh.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserResetPasswordDto } from './dto/user-resetPass.dto';
 import { Response } from 'express';
 import { UserSearchDto } from './dto/user-search.dto';
 import { SuccessResponse } from 'src/constants/reponse.constants';
+import { FileToBodyInterceptor } from 'src/utilities/decorators/api-implicit-form-data.decorator';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('user')
 @Controller('user')
@@ -108,5 +112,16 @@ export class UserController {
     @Res() res: Response,
   ) {
     return await this.userService.getFriendRequest(res, currentUser);
+  }
+
+  @Post()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
+  async uploadImg(
+    @CurrentUser() currentUser: User,
+    @Res() res: Response,
+    @UploadedFiles() file,
+  ) {
+    return await this.userService.uploadImg(res, currentUser, file);
   }
 }
