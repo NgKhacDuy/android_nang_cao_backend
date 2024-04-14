@@ -11,6 +11,7 @@ import {
   Res,
   UseInterceptors,
   UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -30,7 +31,7 @@ import { Response } from 'express';
 import { UserSearchDto } from './dto/user-search.dto';
 import { SuccessResponse } from 'src/constants/reponse.constants';
 import { FileToBodyInterceptor } from 'src/utilities/decorators/api-implicit-form-data.decorator';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('user')
 @Controller('user')
@@ -115,12 +116,11 @@ export class UserController {
   }
 
   @Post('image')
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
+  @UseInterceptors(FileInterceptor('file'))
   async uploadImg(
     @CurrentUser() currentUser: User,
     @Res() res: Response,
-    @UploadedFiles() file,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return await this.userService.uploadImg(res, currentUser, file);
   }
