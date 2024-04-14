@@ -237,6 +237,7 @@ export class UserService {
         file.buffer.toString('base64'),
       ]);
       currentUser.avatar = imgUrl[0];
+      await this.userRepository.save(currentUser);
       return res.status(200).send(SuccessResponse());
     } catch (error) {
       console.error('error', error);
