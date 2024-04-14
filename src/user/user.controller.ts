@@ -114,7 +114,7 @@ export class UserController {
     return await this.userService.getFriendRequest(res, currentUser);
   }
 
-  @Post()
+  @Post('image')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(AnyFilesInterceptor(), FileToBodyInterceptor)
   async uploadImg(
