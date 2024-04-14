@@ -32,6 +32,7 @@ import { stat } from 'fs';
 import { Room } from 'src/chat/entities/room.entity';
 import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 import axios from 'axios';
+import { ImagekitService } from 'src/imagekit/imagekit.service';
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,7 @@ export class UserService {
     @InjectRepository(Friend) private friendRepository: Repository<Friend>,
     @InjectRepository(Room) private roomRepository: Repository<Room>,
     private readonly jwtService: JwtService,
+    private readonly imageKitService: ImagekitService,
   ) {}
 
   async signup(body: UserSignUpDto, res: Response) {
@@ -229,37 +231,15 @@ export class UserService {
     }
   }
 
-  async uploadImg(res: Response, currentUser: User, file: any) {
+  async uploadImg(res: Response, currentUser: User, file: Express.Multer.File) {
     try {
-      var auth = Buffer.from(
-        process.env.PRIVATE_KEY_IMAGE_KIT + ':' + '',
-      ).toString('base64');
-      const headersRequest = {
-        'Content-Type': 'multipart/form-data;',
-        Authorization: `Basic ${auth}`,
-      };
-      for (let i in file) {
-        let data = new FormData();
-        data.append('file', file[i].buffer.toString('base64'));
-        data.append('fileName', file[i].originalname);
-        await axios
-          .request({
-            method: 'POST',
-            maxBodyLength: Infinity,
-            url: process.env.URL_UPLOAD,
-            headers: headersRequest,
-            data: data,
-          })
-          .then((response) => {
-            currentUser.avatar = response.data['url'];
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+      const imgUrl = await this.imageKitService.upload([
+        file.buffer.toString('base64'),
+      ]);
+      currentUser.avatar = imgUrl[0];
       return res.status(200).send(SuccessResponse());
     } catch (error) {
-      console.error(error);
+      console.error('error', error);
     }
   }
 }

@@ -116,6 +116,7 @@ export class UserController {
   }
 
   @Post('image')
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImg(
     @CurrentUser() currentUser: User,

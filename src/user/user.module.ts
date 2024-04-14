@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { Friend } from 'src/friend/entities/friend.entity';
 import { Room } from 'src/chat/entities/room.entity';
+import { ImagekitService } from 'src/imagekit/imagekit.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { Room } from 'src/chat/entities/room.entity';
     JwtModule.register({ secret: process.env.ACCESS_TOKEN_SECRET_KEY }),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, ImagekitService],
   exports: [UserService],
 })
 export class UserModule {}
