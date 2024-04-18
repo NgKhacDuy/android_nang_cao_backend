@@ -125,4 +125,21 @@ export class UserController {
   ) {
     return await this.userService.uploadImg(res, currentUser, file);
   }
+  //Nam
+  @Get('isPhoneNumberExist/:phoneNumber')
+  async isPhoneNumberExist(
+    @Param('phoneNumber') phoneNumber: string,
+    @Res() res: Response,
+  ) {
+    return await this.userService.getUserIdByPhoneNumber(phoneNumber, res);
+  }
+  @Patch('resetpassword/:id')
+  resetPassword(@Param('id') id: string, @Body() password: UserChangePassDto) {
+    return this.userService.changePassword(id, password);
+  }
+  @Get('generateotp')
+  async generateOtpForResetPassword(@Res() res: Response) {
+    return this.userService.generateOTP(4, res);
+  }
+  //Nam
 }

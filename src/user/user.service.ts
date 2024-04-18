@@ -33,6 +33,8 @@ import { Room } from 'src/chat/entities/room.entity';
 import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 import axios from 'axios';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
+import { create } from 'domain';
+import { OTPTypeConstants } from 'src/constants/otp_type.constants';
 
 @Injectable()
 export class UserService {
@@ -40,6 +42,8 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Friend) private friendRepository: Repository<Friend>,
     @InjectRepository(Room) private roomRepository: Repository<Room>,
+    //
+    //
     private readonly jwtService: JwtService,
     private readonly imageKitService: ImagekitService,
   ) {}
@@ -243,6 +247,31 @@ export class UserService {
       console.error('error', error);
     }
   }
+  //Nam
+  async getUserIdByPhoneNumber(phoneNumber: string, res: Response) {
+    const user = await this.userRepository.findOneBy({
+      phoneNumber: phoneNumber,
+    });
+    console.log(user);
+    if (user) {
+      return res.status(200).send(SuccessResponse(user.id));
+    } else
+      return res
+        .status(404)
+        .send(NotFoundResponse('Tài khoản không đúng hoặc không tồn tại'));
+  }
+  generateOTP(length: number, res: Response) {
+    let otp = '';
+    const digits = '0123456789';
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * digits.length);
+      otp += digits[randomIndex];
+    }
+
+    return res.status(200).send(SuccessResponse(otp));
+  }
+  //Nam
 }
 interface JwtPayload {
   id: string;
