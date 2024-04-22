@@ -32,6 +32,7 @@ import { UserSearchDto } from './dto/user-search.dto';
 import { SuccessResponse } from 'src/constants/reponse.constants';
 import { FileToBodyInterceptor } from 'src/utilities/decorators/api-implicit-form-data.decorator';
 import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { UpdateImgDto } from './dto/update-img.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -116,13 +117,25 @@ export class UserController {
   }
 
   @Post('image')
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
   async uploadImg(
     @CurrentUser() currentUser: User,
     @Res() res: Response,
-    @UploadedFile() file: Express.Multer.File,
+    @Body() body: UpdateImgDto,
   ) {
-    return await this.userService.uploadImg(res, currentUser, file);
+    return await this.userService.uploadImg(res, currentUser, body);
+  }
+
+  @Get('generateotp/:phoneNumber')
+  async generateOtpForResetPassword(
+    @Param('phoneNumber') phoneNumber: string,
+    @Res() res: Response,
+  ) {
+    return await this.userService.generateOTP(phoneNumber, 4, res);
+  }
+
+  @UseGuards(AuthenGuard)
+  @Get('friend')
+  async getUserFriend(@Res() res: Response, @CurrentUser() currentUser: User) {
+    return await this.userService.getUserFriend(res, currentUser);
   }
 }

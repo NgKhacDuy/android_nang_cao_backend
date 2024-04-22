@@ -14,6 +14,7 @@ import { ImagekitService } from './imagekit/imagekit.service';
 import { ImagekitModule } from './imagekit/imagekit.module';
 import { ImageModule } from './image/image.module';
 import { OnesignalService } from './onesignal/onesignal.service';
+import { OtpService } from './otp/otp.service';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { OnesignalService } from './onesignal/onesignal.service';
     ImageModule,
   ],
   controllers: [],
-  providers: [AppService, OnesignalService],
+  providers: [AppService, OnesignalService, OtpService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

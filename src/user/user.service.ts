@@ -33,6 +33,8 @@ import { Room } from 'src/chat/entities/room.entity';
 import { FriendStatus } from 'src/utilities/common/friend-status.enum';
 import axios from 'axios';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
+import { OtpService } from 'src/otp/otp.service';
+import { UpdateImgDto } from './dto/update-img.dto';
 
 @Injectable()
 export class UserService {
@@ -42,6 +44,7 @@ export class UserService {
     @InjectRepository(Room) private roomRepository: Repository<Room>,
     private readonly jwtService: JwtService,
     private readonly imageKitService: ImagekitService,
+    private readonly otpService: OtpService,
   ) {}
 
   async signup(body: UserSignUpDto, res: Response) {
@@ -231,16 +234,57 @@ export class UserService {
     }
   }
 
-  async uploadImg(res: Response, currentUser: User, file: Express.Multer.File) {
+  async uploadImg(res: Response, currentUser: User, body: UpdateImgDto) {
     try {
-      const imgUrl = await this.imageKitService.upload([
-        file.buffer.toString('base64'),
-      ]);
+      const imgUrl = await this.imageKitService.upload([body.avatar]);
       currentUser.avatar = imgUrl[0];
       await this.userRepository.save(currentUser);
       return res.status(200).send(SuccessResponse());
     } catch (error) {
       console.error('error', error);
+    }
+  }
+
+  async generateOTP(phoneNumber: string, length: number, res: Response) {
+    let otp = '';
+    const digits = '0123456789';
+    if (phoneNumber.startsWith('0')) {
+      phoneNumber = '84' + phoneNumber.slice(1);
+    }
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * digits.length);
+      otp += digits[randomIndex];
+    }
+    await this.otpService.createOtp(phoneNumber, otp);
+
+    return res.status(200).send(SuccessResponse(otp));
+  }
+
+  async getUserFriend(res: Response, currentUser: User) {
+    try {
+      const friends = await this.friendRepository.find({
+        where: [
+          { idReceiver: currentUser.id, status: FriendStatus.ACCEPTED },
+          { idSender: currentUser.id, status: FriendStatus.ACCEPTED },
+        ],
+      });
+
+      const friendIds = friends.map((friend) =>
+        friend.idSender === currentUser.id
+          ? friend.idReceiver
+          : friend.idSender,
+      );
+
+      const users = await this.userRepository
+        .createQueryBuilder('user')
+        .whereInIds(friendIds)
+        .orderBy('user.name', 'ASC')
+        .getMany();
+
+      return res.status(200).send(SuccessResponse(users));
+    } catch (error) {
+      console.error(error);
     }
   }
 }
