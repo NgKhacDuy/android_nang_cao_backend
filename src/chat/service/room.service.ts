@@ -10,6 +10,8 @@ import { GetMessageDto } from '../dto/get-message.dto';
 import { CreateRoomDto } from '../dto/create-room.dto';
 import axios from 'axios';
 import { OnesignalService } from 'src/onesignal/onesignal.service';
+import { AddUserToGroup } from '../dto/add-user.dto';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class RoomService {
@@ -133,6 +135,32 @@ export class RoomService {
       room.isGroup = dto.listUser.length > 2;
       room.listUsers = dto.listUser;
       room.user = listUser;
+      await this.roomRepository.save(room);
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async addUserToGroup(dto: AddUserToGroup) {
+    try {
+      const room = await this.roomRepository.findOneBy({ id: dto.idRoom });
+      const user = await this.userRepository.findOneBy({ id: dto.idUser });
+      room.listUsers.push(user.id as UUID);
+      room.user.push(user);
+      await this.roomRepository.save(room);
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async removeUser(dto: AddUserToGroup) {
+    try {
+      const room = await this.roomRepository.findOneBy({ id: dto.idRoom });
+      const user = await this.userRepository.findOneBy({ id: dto.idUser });
+      room.listUsers = room.listUsers.filter((e) => e != user.id);
+      room.user = room.user.filter((e) => e != user);
       await this.roomRepository.save(room);
     } catch (error) {
       console.log(error);

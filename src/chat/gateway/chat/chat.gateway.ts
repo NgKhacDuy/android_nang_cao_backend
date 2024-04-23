@@ -9,6 +9,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { AddUserToGroup } from 'src/chat/dto/add-user.dto';
 import { CreateRoomDto } from 'src/chat/dto/create-room.dto';
 import { GetMessageDto } from 'src/chat/dto/get-message.dto';
 import { Room } from 'src/chat/entities/room.entity';
@@ -102,5 +103,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('image')
   async handleImage(socket: Socket, @MessageBody() message: any) {
     this.imagekitService.upload(message);
+  }
+
+  @SubscribeMessage('add_user_to_group')
+  async addUserToGroup(socket: Socket, @MessageBody() message: any) {
+    const convert = JSON.parse(message);
+    const dto: AddUserToGroup = convert;
+    this.roomService.addUserToGroup(dto);
+  }
+
+  @SubscribeMessage('remove_user')
+  async removeUser(socket: Socket, @MessageBody() message: any) {
+    const convert = JSON.parse(message);
+    const dto: AddUserToGroup = convert;
+    this.roomService.removeUser(dto);
   }
 }
