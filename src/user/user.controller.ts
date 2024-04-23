@@ -33,6 +33,7 @@ import { SuccessResponse } from 'src/constants/reponse.constants';
 import { FileToBodyInterceptor } from 'src/utilities/decorators/api-implicit-form-data.decorator';
 import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { UpdateImgDto } from './dto/update-img.dto';
+import { UUID } from 'crypto';
 
 @ApiTags('user')
 @Controller('user')
@@ -137,5 +138,15 @@ export class UserController {
   @Get('friend')
   async getUserFriend(@Res() res: Response, @CurrentUser() currentUser: User) {
     return await this.userService.getUserFriend(res, currentUser);
+  }
+
+  @UseGuards(AuthenGuard)
+  @Get('room/:idUser')
+  async getFriendFavorite(
+    @Res() res: Response,
+    @Param('idUser') id: string,
+    @CurrentUser() currentUser: User,
+  ) {
+    return await this.userService.getRoomFromId(id, res, currentUser);
   }
 }

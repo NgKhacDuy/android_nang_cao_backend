@@ -8,10 +8,11 @@ import { Friend } from 'src/friend/entities/friend.entity';
 import { Room } from 'src/chat/entities/room.entity';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
 import { OtpService } from 'src/otp/otp.service';
+import { Message } from 'src/message/entities/message.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Friend, Room]),
+    TypeOrmModule.forFeature([User, Friend, Room, Message]),
     JwtModule.register({ secret: process.env.ACCESS_TOKEN_SECRET_KEY }),
   ],
   controllers: [UserController],

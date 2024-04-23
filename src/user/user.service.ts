@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ILike, Like, Not, Repository } from 'typeorm';
+import { ArrayContains, ILike, Like, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
@@ -35,6 +35,9 @@ import axios from 'axios';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
 import { OtpService } from 'src/otp/otp.service';
 import { UpdateImgDto } from './dto/update-img.dto';
+import dataSource from 'db/data-source';
+import { Message } from 'src/message/entities/message.entity';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -42,6 +45,7 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Friend) private friendRepository: Repository<Friend>,
     @InjectRepository(Room) private roomRepository: Repository<Room>,
+    @InjectRepository(Message) private messageRepository: Repository<Message>,
     private readonly jwtService: JwtService,
     private readonly imageKitService: ImagekitService,
     private readonly otpService: OtpService,
@@ -186,15 +190,30 @@ export class UserService {
   }
 
   async findUser(keyword: string, res: Response, currentUser: User) {
-    var user = await this.userRepository.find({
-      where: [
-        { name: ILike(`%${keyword}%`), id: Not(currentUser.id) },
-        { phoneNumber: ILike(`%${keyword}%`), id: Not(currentUser.id) },
-      ],
-    });
-    var room = await this.roomRepository.find({
-      where: [{ name: ILike(`%${keyword}%`), isGroup: true }],
-    });
+    const keywordLower = keyword.toLowerCase();
+
+    const userRepository = dataSource.getRepository(User);
+    const roomRepository = dataSource.getRepository(Room);
+
+    const user = await userRepository
+      .createQueryBuilder('user')
+      .where('unaccent(user.name) ILIKE unaccent(:keyword)', {
+        keyword: `%${keywordLower}%`,
+      })
+      .orWhere('unaccent(user.phoneNumber) ILIKE unaccent(:keyword)', {
+        keyword: `%${keywordLower}%`,
+      })
+      .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id })
+      .getMany();
+
+    const room = await roomRepository
+      .createQueryBuilder('room')
+      .where('unaccent(room.name) ILIKE unaccent(:keyword)', {
+        keyword: `%${keywordLower}%`,
+      })
+      .andWhere('room.isGroup = true')
+      .getMany();
+
     await Promise.all(
       user.map(async (item) => {
         item.friends = [];
@@ -209,6 +228,7 @@ export class UserService {
         }
       }),
     );
+
     return res.status(200).send(SuccessResponse({ user: user, room: room }));
   }
 
@@ -281,10 +301,50 @@ export class UserService {
         .whereInIds(friendIds)
         .orderBy('user.name', 'ASC')
         .getMany();
+      const favorite = await this.getFavoriteFriends(currentUser.id as UUID);
 
-      return res.status(200).send(SuccessResponse(users));
+      return res
+        .status(200)
+        .send(SuccessResponse({ users: users, favorite: favorite }));
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  async getFavoriteFriends(userId: UUID) {
+    const room = await this.roomRepository
+      .createQueryBuilder('room')
+      .where('room.isGroup = false')
+      .andWhere('room.listUsers @> ARRAY[:userId]', { userId })
+      .leftJoinAndSelect('room.messages', 'messages')
+      .leftJoinAndSelect('room.user', 'user', 'user.id != :userId', { userId })
+      .addSelect((subQuery) => {
+        return subQuery.select('COUNT(*)').from(Message, 'message');
+      }, 'count')
+      .orderBy('count', 'DESC')
+      .getMany();
+    var listUsers = [];
+    for (const item of room) {
+      for (const user of item.user) {
+        listUsers.push(user);
+      }
+    }
+    return listUsers;
+  }
+
+  async getRoomFromId(id: string, res: Response, currentUser: User) {
+    try {
+      const room = await this.roomRepository.findOne({
+        where: [
+          { listUsers: ArrayContains([currentUser.id, id]) },
+          { listUsers: ArrayContains([id, currentUser.id]) },
+        ],
+        relations: ['user'],
+      });
+      return res.status(200).send(SuccessResponse(room));
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
     }
   }
 }
