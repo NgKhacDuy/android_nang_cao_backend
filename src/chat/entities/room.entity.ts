@@ -29,6 +29,9 @@ export class Room {
   @Column({ default: false })
   isGroup: boolean;
 
+  @Column({ default: false })
+  isOwner: boolean;
+
   @ManyToMany(() => User)
   @JoinTable()
   user: User[];

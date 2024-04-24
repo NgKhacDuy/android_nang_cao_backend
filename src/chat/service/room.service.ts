@@ -45,6 +45,9 @@ export class RoomService {
           });
           return { ...room, lastMessage, partner };
         } else {
+          if (room.listUsers[0] === userId) {
+            room.isOwner = true;
+          }
           return { ...room, lastMessage }; // Spread room properties and add lastMessage
         }
       });
