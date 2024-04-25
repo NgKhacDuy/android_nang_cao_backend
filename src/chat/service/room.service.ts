@@ -103,14 +103,23 @@ export class RoomService {
         }
       }
       if (listUserId.length > 0) {
-        console.log('ready for notification');
-        await this.onesignalService.createNotification(
-          sender.name,
-          'đã gửi tin nhắn đến bạn',
-          listUserId,
-          'message',
-          roomId,
-        );
+        if (room.isGroup == false) {
+          await this.onesignalService.createNotification(
+            sender.name,
+            'Đã gửi tin nhắn đến bạn',
+            listUserId,
+            'message',
+            roomId,
+          );
+        } else {
+          await this.onesignalService.createNotification(
+            sender.name,
+            `Đã gửi tin nhắn đến ${room.name}`,
+            listUserId,
+            'message',
+            roomId,
+          );
+        }
       }
       const message = await this.messageRepository.find({
         relations: { images: true },
@@ -158,6 +167,13 @@ export class RoomService {
         room.user.push(user);
       }
       await this.roomRepository.save(room);
+      this.onesignalService.createNotification(
+        'Nhóm mới',
+        `Bạn đã được thêm vào nhóm ${room.name}`,
+        dto.idUser,
+        'add_user_to_group',
+        '',
+      );
     } catch (error) {
       console.log(error);
       throw new Error(error);
@@ -171,8 +187,8 @@ export class RoomService {
         relations: { user: true },
       });
       const user = await this.userRepository.findOneBy({ id: dto.idUser });
-      room.listUsers = room.listUsers.filter((e) => e != user.id);
-      room.user = room.user.filter((e) => e != user);
+      room.listUsers = room.listUsers.filter((e) => e !== user.id);
+      room.user = room.user.filter((e) => e.id !== user.id);
       await this.roomRepository.save(room);
     } catch (error) {
       console.log(error);
