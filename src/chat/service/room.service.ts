@@ -148,7 +148,10 @@ export class RoomService {
 
   async addUserToGroup(dto: AddUserToGroup) {
     try {
-      const room = await this.roomRepository.findOneBy({ id: dto.idRoom });
+      const room = await this.roomRepository.findOne({
+        where: { id: dto.idRoom },
+        relations: { user: true },
+      });
       for (const e of dto.idUser) {
         const user = await this.userRepository.findOneBy({ id: e });
         room.listUsers.push(user.id as UUID);
@@ -163,7 +166,10 @@ export class RoomService {
 
   async removeUser(dto: RemoveUserOutGroup) {
     try {
-      const room = await this.roomRepository.findOneBy({ id: dto.idRoom });
+      const room = await this.roomRepository.findOne({
+        where: { id: dto.idRoom },
+        relations: { user: true },
+      });
       const user = await this.userRepository.findOneBy({ id: dto.idUser });
       room.listUsers = room.listUsers.filter((e) => e != user.id);
       room.user = room.user.filter((e) => e != user);
