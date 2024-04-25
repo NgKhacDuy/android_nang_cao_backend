@@ -12,6 +12,7 @@ import axios from 'axios';
 import { OnesignalService } from 'src/onesignal/onesignal.service';
 import { AddUserToGroup } from '../dto/add-user.dto';
 import { UUID } from 'crypto';
+import { RemoveUserOutGroup } from '../dto/remove-user.dto';
 
 @Injectable()
 export class RoomService {
@@ -148,9 +149,11 @@ export class RoomService {
   async addUserToGroup(dto: AddUserToGroup) {
     try {
       const room = await this.roomRepository.findOneBy({ id: dto.idRoom });
-      const user = await this.userRepository.findOneBy({ id: dto.idUser });
-      room.listUsers.push(user.id as UUID);
-      room.user.push(user);
+      for (const e of dto.idUser) {
+        const user = await this.userRepository.findOneBy({ id: e });
+        room.listUsers.push(user.id as UUID);
+        room.user.push(user);
+      }
       await this.roomRepository.save(room);
     } catch (error) {
       console.log(error);
@@ -158,7 +161,7 @@ export class RoomService {
     }
   }
 
-  async removeUser(dto: AddUserToGroup) {
+  async removeUser(dto: RemoveUserOutGroup) {
     try {
       const room = await this.roomRepository.findOneBy({ id: dto.idRoom });
       const user = await this.userRepository.findOneBy({ id: dto.idUser });

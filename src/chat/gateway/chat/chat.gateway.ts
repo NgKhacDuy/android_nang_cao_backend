@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { AddUserToGroup } from 'src/chat/dto/add-user.dto';
 import { CreateRoomDto } from 'src/chat/dto/create-room.dto';
 import { GetMessageDto } from 'src/chat/dto/get-message.dto';
+import { RemoveUserOutGroup } from 'src/chat/dto/remove-user.dto';
 import { Room } from 'src/chat/entities/room.entity';
 import { RoomService } from 'src/chat/service/room.service';
 import { ImagekitService } from 'src/imagekit/imagekit.service';
@@ -115,7 +116,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('remove_user')
   async removeUser(socket: Socket, @MessageBody() message: any) {
     const convert = JSON.parse(message);
-    const dto: AddUserToGroup = convert;
+    const dto: RemoveUserOutGroup = convert;
     this.roomService.removeUser(dto);
   }
 }

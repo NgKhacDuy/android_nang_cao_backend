@@ -1,4 +1,4 @@
 export class AddUserToGroup {
   idRoom: string;
-  idUser: string;
+  idUser: string[];
 }
