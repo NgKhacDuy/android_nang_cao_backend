@@ -341,7 +341,12 @@ export class UserService {
         ],
         relations: ['user'],
       });
-      return res.status(200).send(SuccessResponse(room));
+      const partnerId =
+        room.listUsers[0] === id ? room.listUsers[1] : room.listUsers[0];
+      const partner = await this.userRepository.findOneBy({
+        id: partnerId,
+      });
+      return res.status(200).send(SuccessResponse({ ...room, partner }));
     } catch (error) {
       console.error(error);
       throw new Error(error);
