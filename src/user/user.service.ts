@@ -336,8 +336,8 @@ export class UserService {
     try {
       const room = await this.roomRepository.findOne({
         where: [
-          { listUsers: ArrayContains([currentUser.id, id]) },
-          { listUsers: ArrayContains([id, currentUser.id]) },
+          { listUsers: ArrayContains([currentUser.id, id]), isGroup: false },
+          { listUsers: ArrayContains([id, currentUser.id]), isGroup: false },
         ],
         relations: ['user'],
       });
