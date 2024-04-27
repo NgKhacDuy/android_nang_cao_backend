@@ -342,7 +342,7 @@ export class UserService {
         relations: ['user'],
       });
       const partnerId =
-        room.listUsers[0] === id ? room.listUsers[1] : room.listUsers[0];
+        room.listUsers[0] === id ? room.listUsers[0] : room.listUsers[1];
       const partner = await this.userRepository.findOneBy({
         id: partnerId,
       });
