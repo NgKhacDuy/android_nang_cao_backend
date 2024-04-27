@@ -352,6 +352,19 @@ export class UserService {
       throw new Error(error);
     }
   }
+
+  async getUserIdByPhoneNumber(phoneNumber: string, res: Response) {
+    const user = await this.userRepository.findOneBy({
+      phoneNumber: phoneNumber,
+    });
+    console.log(user);
+    if (user) {
+      return res.status(200).send(SuccessResponse(user.id));
+    } else
+      return res
+        .status(404)
+        .send(NotFoundResponse('Tài khoản không đúng hoặc không tồn tại'));
+  }
 }
 interface JwtPayload {
   id: string;
